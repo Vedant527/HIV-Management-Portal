@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "hiv-management-db",
+  "private_key_id": "16bc967eb2dc902a8d02239596a039cdc6a119ce",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQC5PtwVBZ3S5UCl\nTL4a7lNIal35rUpSypHLA40pmSOLkXXw2h6ZjvcF6jIWW+g3lx9lNEb0MZoUP9tx\nRbXlk9mc8nYGbzSGxLV9DRYx1zmp9wWpDm0zmaiFP3gwIeXiBg++MHlJ4rqbYFLA\njVHE4+oMjcmWTufvC9Vhw37GFaN6tor/ag75qV7rkt59rRl5HKoRKjqLeJcSNj2B\np/JjKLCcilWKYaplHtSMf8R6Og01ui8MbOqJk3/NAYrb8NCLSJGVqRAcIdRWCQKi\nM6LKiZjA3gPP7Ro88NMIJ7+yObdElOCo6FTl60AyQ/V7ZtJa9PoqN0N93AlwjQF7\n89OwvJr5AgMBAAECggEADp5NCFSn4nloa1L9yorFpDiOn3IjJBrru+lVFbQJx80M\nEVxpH0WWrU8Qsk6A6gghOF+SfNlANzpd0xfE9a+/88B3e2UBsGPsDYj/mCHLoWPG\nvNNQX0rQL2m1jpjSNw6y5deV7rR3dOT6SsssKX0x3lk/D/88ktLsfRlMEw4olzmX\npj+36iEx5ewQjZ4PgIlKhThCaU6nealTYoHmX36tAYmipxske3TDJh5SU0ILTijO\nSDwhgdW8SOpk/wFP8tJlwLRrpIhqXU+ZqBcxqvh5G8YxZNqa5MBkSHhM5X5qTz9D\nn2l4yolxTrDG9QaOwihLr1V9IqoxF3WFhGWhoUWinQKBgQDgZLililNIa8W0Q2Jf\nDNkNgqE6XXYs5t4lOwOJMRzIE3fNWhvGEHKG8AjqygFrA4RPl9zuqYSssDNO7z9p\n5iwvUxBh/soGjeC/pf5SLFqBkyv754zZfwpy2P2IWc+mT2Xlr6P4Xsh8uBtNCoYF\nWjfsxkLnen4NYFKv1RMYwA5atQKBgQDTVoavfzIM/U9J2VdVFHMUNZhZ+zHbyudh\nurefakztF1osYSOrv2td49535dX6QiTSuDIYgzJliZjXNca//2S/qTaKzIT9YIG1\njh2w1k9C7In3BqhP66kePsDQL5LzSXpTSOhILt3Ey3IL28J0r08PNyxoLrZws7Hm\nJIAuBPM1tQKBgBh5Y9pKWAMSHiInJ1eOoy3iDYu8HeOP2rLc2OnhvW3lEbAIH/de\nW99z1sUk+zqcy5WSzroJKztajH4Tgiseu7r9qE/H5mkImHbOuApmZAi18JotCyO9\nw3n7SMvSX9+X0VlX6t5wGBXiTrf8admzmV3t0eZFafIzi1E6QDb225nxAoGAV9xL\nFj79IeVVx0/yPM7JoQc/FXmXGtdaJoknucDJxm/E71pbKBXmnxwS6ynEMcy53ljx\nirtQgmIYBrC2ti+JRR0mLcIlL+mlQ0OYGGKghSQtn2NHKiLBJm/UXTjKERblIibX\nWtsRG7Ww7jkouLYBWkQH1DBHbMdoGFPobjlkm1kCgYBdEOAenGBLN4CWtrbk2bLS\ntPIjVM0T4+GFVAhcIC3eyal+h7TlfLkdYAOHdT0f5nZYHF6Gl9hJSNWQroiyRKGu\nalJHDIzL+u14WfzIp+vTSypQyYUUlxwnEc+VG565bdjZBCojejPl29mj5SULfrH+\nNWrHNreyH1ghljpecvS6XQ==\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-19yw2@hiv-management-db.iam.gserviceaccount.com",
+  "client_id": "111475248368871514114",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-19yw2%40hiv-management-db.iam.gserviceaccount.com"
+}
