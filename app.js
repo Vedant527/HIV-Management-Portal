@@ -81,4 +81,14 @@ app.post('/login', (req, res) => {
       res.status(500).send('Error creating user account');
     }
   });
+  app.get('/exercise', function(req, res) {
+    res.render('exercise');
+  });
+  app.post('/exercise', function(req, res) {
+    const exercise = req.body.exercise;
+    const date = req.body.date;
+    const length = req.body.length;
+    const calories = req.body.calories;
   
+    //store data in database
+  });
