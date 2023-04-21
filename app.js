@@ -19,7 +19,7 @@ app.set('view engine', 'ejs');
 app.set('views', './views');
 
 // Start the server
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3003;
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
@@ -112,4 +112,12 @@ app.post('/login', (req, res) => {
     const calories = req.body.calories;
   
     //store data in database
+    const currUser = req.session.userId;
+    admin.database().ref('users').child(currUser).push({
+      exercise: exercise,
+      date: date,
+      length: length,
+      calories: calories
+    });
+    res.render('exercise');
   });
