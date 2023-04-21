@@ -1,27 +1,98 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+    <style>
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+        background-color: #f2f2f2;
+        padding: 20px;
+      }
+
+      h1 {
+        text-align: center;
+        color: #333;
+      }
+
+      form {
+        margin: 0 auto;
+        width: 80%;
+        max-width: 500px;
+        background-color: #fff;
+        padding: 30px;
+        border-radius: 5px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+      }
+
+      label {
+        display: block;
+        font-size: 16px;
+        margin-bottom: 10px;
+        color: #666;
+      }
+
+      input[type="email"],
+      input[type="password"] {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        margin-bottom: 20px;
+      }
+
+      button[type="submit"] {
+        background-color: #4CAF50;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        font-size: 16px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 20px;
+      }
+
+      button[type="submit"]:hover {
+        background-color: #3e8e41;
+      }
+
+      button[type="signup"] {
+        background-color: #008CBA;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        font-size: 16px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 20px;
+      }
+
+      button[type="signup"]:hover {
+        background-color: #006080;
+      }
+    </style>
   </head>
   <body>
-    <h1>Login</h1>
+    <h1>Welcome to the HIV Management Portal!</h1>
     <form method="POST" action="/login">
       <div>
-        <label>Email:</label>
-        <input type="email" name="email" required>
+        <label for="email">Email:</label>
+        <input type="email" name="email" id="email" required>
       </div>
       <div>
-        <label>Password:</label>
-        <input type="password" name="password" required>
+        <label for="password">Password:</label>
+        <input type="password" name="password" id="password" required>
       </div>
       <div>
         <button type="submit">Login</button>
       </div>
     </form>
     <form method="GET" action="/signup">
-        <div>
-          <button type="Sign Up!">signup</button>
-        </div>
+      <div>
+        <button type="signup">Sign Up!</button>
+      </div>
     </form>
   </body>
 </html>
