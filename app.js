@@ -1,6 +1,8 @@
 // Import required libraries
 const express = require('express');
 const admin = require('firebase-admin');
+const session = require('express-session');
+const crypto = require('crypto');
 
 // Initialize the Express app
 const app = express();
@@ -16,20 +18,31 @@ admin.initializeApp({
 app.set('view engine', 'ejs');
 app.set('views', './views');
 
-// Define a route for the login page
-app.get('/', (req, res) => {
-  res.render('login');
-});
-
 // Start the server
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
 
+// Setup Express Session
+app.use(session({
+  secret: crypto.randomBytes(32).toString('hex'),
+  resave: false,
+  saveUninitialized: false
+}));
+
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+// LOGIN PAGE
+app.get('/', (req, res) => {
+  if (req.session.userId != null) {
+    res.render('home');
+  } else {
+    res.render('login');
+  }
+});
 
 app.post('/login', (req, res) => {
     const { email, password } = req.body;
@@ -40,6 +53,7 @@ app.post('/login', (req, res) => {
     admin.auth().getUserByEmail(email)
       .then((userRecord) => {
         const uid = userRecord.uid;
+        req.session.userId = uid;
         return admin.auth().createCustomToken(uid)
           .then((customToken) => {
             return res.render('home', { token: customToken });
@@ -55,6 +69,7 @@ app.post('/login', (req, res) => {
       });
   });
 
+  // SIGNUP PAGE
   app.get('/signup', (req, res) => {
     res.render('signup');
   });
@@ -81,9 +96,15 @@ app.post('/login', (req, res) => {
       res.status(500).send('Error creating user account');
     }
   });
+
+  // EXERCISE PAGE
   app.get('/exercise', function(req, res) {
+    if (req.session.userId == null) {
+      res.render('login');
+    }
     res.render('exercise');
   });
+
   app.post('/exercise', function(req, res) {
     const exercise = req.body.exercise;
     const date = req.body.date;
