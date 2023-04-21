@@ -121,3 +121,24 @@ app.post('/login', (req, res) => {
     });
     res.render('exercise');
   });
+
+  app.get('/appointments', function(req, res) {
+    if (req.session.userId == null) {
+      res.render('login');
+    }
+    res.render('appointments');
+  });
+  app.post('/appointments', function(req, res) {
+    const type = req.body.type;
+    const date = req.body.date;
+    const time = req.body.time;
+
+
+    const currUser = req.session.userId;
+    admin.database().ref('users').child(currUser).push({
+      type: type,
+      date: date,
+      time: time,
+    });
+    res.render('appointments');
+  });
