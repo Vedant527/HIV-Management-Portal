@@ -74,10 +74,15 @@
 			<button>View Medications</button>
 		</div>
 		<div class="card">
-			<h2>Appointments</h2>
-			<p>View and manage appointment data</p>
-			<button>View Appointments</button>
-		</div>
+            <h2>Appointments</h2>
+            <p>View and manage appointment data</p>
+            <button id = "myApps">View Appointments</button>
+            <script>
+                document.getElementById("myApps").addEventListener("click", function() {
+                  window.location.href = "/appointments";
+                });
+            </script>
+        </div>
 		<div class="card">
 			<h2>Exercise</h2>
 			<p>View and manage appointment data</p>
