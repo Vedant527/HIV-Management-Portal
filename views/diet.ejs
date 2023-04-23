@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-3Fg0KdN6Qi0U6qN3OKPakf/96rUedXVHzhGkz+N6yOGn6+GI3xUaL6UqA6dDz+GlKXJZv2QWQ5G5y2d5mwmsPw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.0/fullcalendar.min.css" />
+	<link rel="stylesheet" href="fullcalendar.css" />
+	<script src="fullcalendar.js"></script>
+
+	<style>
+		#calendar {
+			max-width: 500px;
+			margin: 0 auto;
+		}
+	</style>  
+</head>
+<title>HIV Management Portal</title>
+<style>
+	body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            margin: 20px;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            box-shadow: 0px 2px 2px #ccc;
+        }
+        .card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 10px;
+            padding: 20px;
+            background-color: #eee;
+            border: 1px solid #ccc;
+            box-shadow: 0px 2px 2px #ccc;
+        }
+        .card h2 {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .card p {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        .card button {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .card button:hover {
+            background-color: #444;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            text-align: left;
+            padding: 8px;
+        }
+        th {
+			background-color: #333;
+            color: #fff;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+		header a {
+            color: #fff;
+            text-decoration: none;
+            }
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-top: 10px;
+            margin-bottom: 30px;
+            }
+        h3 {
+            text-align: center;
+        }
+
+        form label,
+        form input {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        }
+</style>
+</head>
+<body>
+	<header><a href="/home">HIV Management Portal</a></header>
+		<div class="card">
+			<h2>Diet</h2>
+		</div>
+
+		<div id="calendar"></div>
+		
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.0/fullcalendar.min.js"></script>
+			<script>
+
+			const events = [];
+			const constants = {
+        "Black beans": 120,
+        "Brown rice": 218,
+        "Cereal": 110,
+        "Cheese": 113,
+        "Chicken": 140,
+        "Eggs": 78,
+        "Fruit": 100,
+        "Fries": 365,
+        "Granola": 113,
+        "Greek yogurt": 100,
+        "Grilled cheese sandwich": 300,
+        "Hummus": 25,
+        "Nut butter": 95,
+        "Nuts": 163,
+        "Oatmeal": 150,
+        "Pancakes": 130,
+        "Protein shake": 120,
+        "Rice cakes": 35,
+        "Salsa": 10,
+        "Salmon or fish": 200,
+        "Scrambled eggs": 120,
+        "Shrimp": 60,
+        "Smoothie": 150,
+        "Stir-fry": 200,
+        "Sweet potato": 112,
+        "Tomato soup": 160,
+        "Tofu": 94,
+        "Trail mix": 180,
+        "Turkey": 90,
+        "Veggie burger": 124,
+        "Vegetable curry": 200,
+        "Vegetable soup": 75,
+        "Vegetables": 25,
+        "Whole grain crackers": 120,
+        "Whole grain toast": 70,
+        "Whole wheat pasta": 174,
+        "White rice": 242,
+        "White toast": 70,
+        "Yogurt": 110
+      };
+
+
+			// loop through each event and add it to the array
+			<% events.forEach(function(event) { %>
+				events.push({
+				title: '<%= event.title %>',
+				start: '<%= event.start %>',
+				servings: '<%= event.servings %>',
+        dish: '<%= event.dish %>'
+				});
+			<% }); %>
+
+			var table = null;
+			var tableCreated = false;
+
+			
+			$(document).ready(function() {
+				
+			$('#calendar').fullCalendar({
+				header: {
+				left: 'prev,next today',
+				center: 'title',
+				right: 'month,agendaWeek,agendaDay'
+				},
+				editable: true,
+				events: events,
+				dateClick: function(info) {
+				alert('Clicked on: ' + info.dateStr);
+			},
+
+      eventClick: function(calEvent, jsEvent, view) {
+          if (!tableCreated) {
+            tableCreated = true;
+          } else {
+            // clear the table content
+            table.innerHTML = "";
+          }
+
+          table = document.createElement("table");
+
+          // add a header row to the table
+          var headerRow = table.insertRow();
+          var dateHeader = headerRow.insertCell();
+          dateHeader.innerHTML = "Date";
+          var titleHeader = headerRow.insertCell();
+          titleHeader.innerHTML = "Meal Type";
+          var startHeader = headerRow.insertCell();
+          startHeader.innerHTML = "Dish";
+          var lengthHeader = headerRow.insertCell();
+          lengthHeader.innerHTML = "Servings";
+          var caloriesHeader = headerRow.insertCell();
+          caloriesHeader.innerHTML = "Calories";
+          headerRow.style.backgroundColor = "#333";
+          headerRow.style.color = "white";
+
+          // add a data row to the table for the clicked event
+          var clickedDate = calEvent.start.format();
+          var eventsOnDate = events.filter(function(event) {
+            return event.start === clickedDate;
+          });
+
+          var totalCalories = 0;
+          eventsOnDate.forEach(function(event) {
+            var dataRow = table.insertRow();
+            var startCell = dataRow.insertCell();
+            startCell.innerHTML = event.start;
+            var titleCell = dataRow.insertCell();
+            titleCell.innerHTML = event.title;
+            var dishCell = dataRow.insertCell();
+            dishCell.innerHTML = event.dish;
+            var lengthCell = dataRow.insertCell();
+            lengthCell.innerHTML = event.servings;
+            var caloriesCell = dataRow.insertCell();
+            var calories = event.servings * constants[event.dish];
+            caloriesCell.innerHTML = calories;
+            totalCalories += calories;
+          });
+
+          // add a row for the total calories
+          var totalRow = table.insertRow();
+          totalRow.style.fontWeight = "bold";
+          var totalHeader = totalRow.insertCell();
+          totalHeader.colSpan = "4";
+          totalHeader.innerHTML = "Total Calories:";
+          var totalCaloriesCell = totalRow.insertCell();
+          totalCaloriesCell.innerHTML = totalCalories;
+
+          // append the table to the document
+          // append the table to the table-container div element
+          document.getElementById("table-container").appendChild(table);
+        }
+
+
+            });
+            });
+
+		</script>
+		  
+<div id="table-container"></div>
+<h3>Record a Meal</h3>
+<form action="/diet" method="post">
+
+  <label for="date">Date:</label>
+	<input type="date" id="date" name="date">
+	
+  <label for="type">Meal Type:</label>
+	<select id="type" name="type">
+    <option value="Breakfast">Breakfast</option>
+    <option value="Lunch">Lunch</option>
+    <option value="Dinner">Dinner</option>
+    <option value="Snack">Snack</option>
+  </select>
+  
+	<label for="dish">Dish:</label>
+	<select id="dish" name="dish">
+    <option value="Black beans">Black beans</option>
+    <option value="Brown rice">Brown rice</option>
+    <option value="Cereal">Cereal</option>
+    <option value="Cheese">Cheese</option>
+    <option value="Chicken">Chicken</option>
+    <option value="Eggs">Eggs</option>
+    <option value="Fruit">Fruit</option>
+    <option value="Fries">Fries</option>
+    <option value="Granola">Granola</option>
+    <option value="Greek yogurt">Greek yogurt</option>
+    <option value="Grilled cheese sandwich">Grilled cheese sandwich</option>
+    <option value="Hummus">Hummus</option>
+    <option value="Nut butter">Nut butter</option>
+    <option value="Nuts">Nuts</option>
+    <option value="Oatmeal">Oatmeal</option>
+    <option value="Pancakes">Pancakes</option>
+    <option value="Protein shake">Protein shake</option>
+    <option value="Rice cakes">Rice cakes</option>
+    <option value="Salsa">Salsa</option>
+    <option value="Salmon or fish">Salmon or fish</option>
+    <option value="Scrambled eggs">Scrambled eggs</option>
+    <option value="Shrimp">Shrimp</option>
+    <option value="Smoothie">Smoothie</option>
+    <option value="Stir-fry">Stir-fry</option>
+    <option value="Sweet potato">Sweet potato</option>
+    <option value="Tomato soup">Tomato soup</option>
+    <option value="Tofu">Tofu</option>
+    <option value="Trail mix">Trail mix</option>
+    <option value="Turkey">Turkey</option>
+    <option value="Veggie burger">Veggie burger</option>
+    <option value="Vegetable curry">Vegetable curry</option>
+    <option value="Vegetable soup">Vegetable soup</option>
+    <option value="Vegetables">Vegetables</option>
+    <option value="Whole grain crackers">Whole grain crackers</option>
+    <option value="Whole grain toast">Whole grain toast</option>
+    <option value="Whole wheat pasta">Whole wheat pasta</option>
+    <option value="White rice">White rice</option>
+    <option value="White toast">White toast</option>
+    <option value="Yogurt">Yogurt</option>
+  </select>
+
+	<label for="servings">Servings:</label>
+	<input type="number" id="servings" name="servings">
+
+	<button type="submit">Submit</button>
+	</form>
+</div>
+<div>
+  <h3>More Information</h3>
+   <p>
+    The dishes listed on this portal are suggestions for healthy meals for suitable for someone living with HIV. You can discover more healthy food options  <a href="https://hivinfo.nih.gov/understanding-hiv/fact-sheets/hiv-and-nutrition-and-food-safety"> on this website</a> provided by the National Institutes of Health.
+</p>
+</div>
+</body>
+</html>

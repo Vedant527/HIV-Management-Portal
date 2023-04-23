@@ -13,7 +13,7 @@
 		}
 	</style>  
 </head>
-<title>HIV Management</title>
+<title>HIV Management Portal</title>
 <style>
 	body {
             font-family: Arial, sans-serif;
@@ -110,7 +110,7 @@
 </style>
 </head>
 <body>
-	<header><a href="/home">HIV Management</a></header>
+	<header><a href="/home">HIV Management Portal</a></header>
 		<div class="card">
 			<h2>Exercise</h2>
 		</div>
@@ -134,9 +134,6 @@
 				"Swimming": 8,
 				"Dancing": 8
 			};
-
-
-
 
 			// loop through each event and add it to the array
 			<% events.forEach(function(event) { %>
@@ -166,60 +163,61 @@
 			},
 			eventClick: function(calEvent, jsEvent, view) {
 				if (!tableCreated) {
-				// create a new HTML table element
+					tableCreated = true;
+				} else {
+					// clear the table content
+					table.innerHTML = "";
+				}
+
 				table = document.createElement("table");
 
 				// add a header row to the table
 				var headerRow = table.insertRow();
+				var dateHeader = headerRow.insertCell();
+				dateHeader.innerHTML = "Date";
 				var titleHeader = headerRow.insertCell();
-				titleHeader.innerHTML = "Type";
+				titleHeader.innerHTML = "Exercise Type";
 				var startHeader = headerRow.insertCell();
-				startHeader.innerHTML = "Date";
-				var lengthHeader = headerRow.insertCell();
-				lengthHeader.innerHTML = "Length";
+				startHeader.innerHTML = "Length";
 				var caloriesHeader = headerRow.insertCell();
 				caloriesHeader.innerHTML = "Calories";
 				headerRow.style.backgroundColor = "#333";
-  				headerRow.style.color = "white";
+				headerRow.style.color = "white";
 
-				// set the flag to true
-				tableCreated = true;
-			} else {
-				// clear the table content
-				table.innerHTML = "";
-				table = document.createElement("table");
+				// add a data row to the table for the clicked event
+				var clickedDate = calEvent.start.format();
+				var eventsOnDate = events.filter(function(event) {
+					return event.start === clickedDate;
+				});
 
-				// add a header row to the table
-				var headerRow = table.insertRow();
-				var titleHeader = headerRow.insertCell();
-				titleHeader.innerHTML = "Type";
-				var startHeader = headerRow.insertCell();
-				startHeader.innerHTML = "Date";
-				var lengthHeader = headerRow.insertCell();
-				lengthHeader.innerHTML = "Length";
-				var caloriesHeader = headerRow.insertCell();
-				caloriesHeader.innerHTML = "Calories";
-				headerRow.style.backgroundColor = "#333";
-  				headerRow.style.color = "white";
+				var totalCalories = 0;
+				eventsOnDate.forEach(function(event) {
+					var dataRow = table.insertRow();
+					var startCell = dataRow.insertCell();
+					startCell.innerHTML = event.start;
+					var titleCell = dataRow.insertCell();
+					titleCell.innerHTML = event.title;
+					var lengthCell = dataRow.insertCell();
+					lengthCell.innerHTML = event.length;
+					var caloriesCell = dataRow.insertCell();
+					var calories = event.length * constants[event.title];
+					caloriesCell.innerHTML = calories;
+					totalCalories += calories;
+				});
 
-			}
+				// add a row for the total calories
+				var totalRow = table.insertRow();
+				totalRow.style.fontWeight = "bold";
+				var totalHeader = totalRow.insertCell();
+				totalHeader.colSpan = "3";
+				totalHeader.innerHTML = "Total Calories:";
+				var totalCaloriesCell = totalRow.insertCell();
+				totalCaloriesCell.innerHTML = totalCalories;
 
-			// add a data row to the table for the clicked event
-			var dataRow = table.insertRow();
-			var titleCell = dataRow.insertCell();
-			titleCell.innerHTML = calEvent.title;
-			var startCell = dataRow.insertCell();
-			startCell.innerHTML = calEvent.start.format();
-			var lengthCell = dataRow.insertCell();
-			lengthCell.innerHTML = calEvent.length || "";
-			var caloriesCell = dataRow.insertCell();
-			caloriesCell.innerHTML = calEvent.length*constants[calEvent.title];
-
-			// append the table to the document
-			// append the table to the table-container div element
-			document.getElementById("table-container").appendChild(table);
-
-    	}
+				// append the table to the document
+				// append the table to the table-container div element
+				document.getElementById("table-container").appendChild(table);
+				}
 			});
 			});
 		</script>
@@ -227,6 +225,9 @@
 <div id="table-container"></div>
 <h3>Create an Exercise</h3>
 <form action="/exercise" method="post">
+	<label for="date">Date:</label>
+	<input type="date" id="date" name="date">
+
 	<label for="exercise">Exercise Type:</label>
 	<select id="exercise" name="exercise">
 		<option value="Walking">Walking</option>
@@ -240,8 +241,6 @@
 		<option value="Dancing">Dancing</option>
 	</select>
 	
-	<label for="date">Date:</label>
-	<input type="date" id="date" name="date">
 	
 	<label for="length">Exercise Length (in minutes):</label>
 	<input type="number" id="length" name="length">

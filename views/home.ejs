@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>HIV Management</title>
+	<title>HIV Management Portal</title>
 	<style>
 		body {
 			font-family: Arial, sans-serif;
@@ -28,6 +28,8 @@
 			box-shadow: 0px 2px 2px #ccc;
 		}
 		.card {
+			width: 300px; /* set a fixed width */
+			height: 180px; /* set a fixed height */
 			display: flex;
 			flex-direction: column;
 			align-items: center;
@@ -38,6 +40,7 @@
 			border: 1px solid #ccc;
 			box-shadow: 0px 2px 2px #ccc;
 		}
+
 		.card h2 {
 			font-size: 24px;
 			font-weight: bold;
@@ -58,24 +61,18 @@
 		.card button:hover {
 			background-color: #444;
 		}
+		button{
+			width: 200px; /* set a fixed width */
+			height: 40px; /* set a fixed height */
+		}
 	</style>
 </head>
 <body>
-	<header>HIV Management</header>
+	<header>HIV Management Portal</header>
 	<div class="container">
 		<div class="card">
-			<h2>Patients</h2>
-			<p>View and manage patient data</p>
-			<button>View Patients</button>
-		</div>
-		<div class="card">
-			<h2>Medications</h2>
-			<p>View and manage medication data</p>
-			<button>View Medications</button>
-		</div>
-		<div class="card">
             <h2>Appointments</h2>
-            <p>View and manage appointment data</p>
+            <p>View and manage appointments</p>
             <button id = "myApps">View Appointments</button>
             <script>
                 document.getElementById("myApps").addEventListener("click", function() {
@@ -85,11 +82,21 @@
         </div>
 		<div class="card">
 			<h2>Exercise</h2>
-			<p>View and manage appointment data</p>
-			<button id = "myExercise">View Exercise</button>
+			<p>View and track exercises</p>
+			<button id = "myExercise">View Exercises</button>
 			<script>
 				document.getElementById("myExercise").addEventListener("click", function() {
 				  window.location.href = "/exercise";
+				});
+			</script>
+		</div>
+		<div class="card">
+			<h2>Diet</h2>
+			<p>View and track diet</p>
+			<button id = "myDiet">View Diet</button>
+			<script>
+				document.getElementById("myDiet").addEventListener("click", function() {
+				  window.location.href = "/diet";
 				});
 			</script>
 		</div>

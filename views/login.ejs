@@ -10,12 +10,10 @@
         background-color: #f2f2f2;
         padding: 20px;
       }
-
       h1 {
         text-align: center;
         color: #333;
       }
-
       form {
         margin: 0 auto;
         width: 80%;
@@ -25,14 +23,12 @@
         border-radius: 5px;
         box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
       }
-
       label {
         display: block;
         font-size: 16px;
         margin-bottom: 10px;
         color: #666;
       }
-
       input[type="email"],
       input[type="password"] {
         width: 100%;
@@ -42,7 +38,6 @@
         border: 1px solid #ccc;
         margin-bottom: 20px;
       }
-
       button[type="submit"] {
         background-color: #4CAF50;
         color: #fff;
@@ -53,11 +48,9 @@
         cursor: pointer;
         margin-top: 20px;
       }
-
       button[type="submit"]:hover {
         background-color: #3e8e41;
       }
-
       button[type="signup"] {
         background-color: #008CBA;
         color: #fff;
@@ -68,7 +61,6 @@
         cursor: pointer;
         margin-top: 20px;
       }
-
       button[type="signup"]:hover {
         background-color: #006080;
       }
@@ -94,5 +86,8 @@
         <button type="signup">Sign Up!</button>
       </div>
     </form>
+    <% if (message) { %>
+      <p class="error-message"><%= message %></p>
+    <% } %>
   </body>
 </html>

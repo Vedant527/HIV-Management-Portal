@@ -40,7 +40,7 @@ app.get('/', (req, res) => {
   if (req.session.userId != null) {
     res.render('home');
   } else {
-    res.render('login');
+    res.render('login', { message: null});
   }
 });
 
@@ -65,18 +65,25 @@ app.post('/login', (req, res) => {
       })
       .catch((error) => {
         console.log(error);
-        return res.render('login', { message: 'User not found' });
+        const errorMessage = 'Incorrect username or password. Please try again.';
+        return res.render('login', { message: errorMessage });
       });
   });
 
+
   // SIGNUP PAGE
   app.get('/signup', (req, res) => {
-    res.render('signup');
+    res.render('signup', {message: null});
   });
 
   app.post('/signup', async (req, res) => {
     const { email, username, password } = req.body;
-    try {
+    try { 
+      // see if account exists
+      await admin.auth().getUserByEmail(email).then(() => {
+        // Email is already registered
+        res.render('signup', { message: 'Email is already registered' });
+      })
       // Create a new user account in Firebase Authentication
       const userRecord = await admin.auth().createUser({
         email,
@@ -103,7 +110,7 @@ app.post('/login', (req, res) => {
     if (req.session.userId != null) {
       res.render('home');
     } else {
-      res.render('login');
+      res.render('login', { message: null});
     }
   });
 
@@ -113,7 +120,7 @@ app.post('/login', (req, res) => {
   // EXERCISE PAGE
   app.get('/exercise', function(req, res) {
     if (req.session.userId == null) {
-      res.render('login');
+      res.render('login', { message: null});
     } else {
       const currUser = req.session.userId;
       const events = [];
@@ -161,7 +168,7 @@ app.post('/login', (req, res) => {
 // APPOINTMENTS PAGE
   app.get('/appointments', function(req, res) {
     if (req.session.userId == null) {
-      res.render('login');
+      res.render('login', { message: null});
     } else {
       const currUser = req.session.userId;
       const userRef = admin.database().ref('users').child(currUser);
@@ -233,3 +240,50 @@ app.post('/login', (req, res) => {
     });
   });
   
+
+   // DIET PAGE
+   app.get('/diet', function(req, res) {
+    if (req.session.userId == null) {
+      res.render('login', { message: null});
+    } else {
+      const currUser = req.session.userId;
+      const events = [];
+  
+      admin.database().ref('users').child(currUser).orderByChild('date').on('value', function(snapshot) {
+        snapshot.forEach(function(childSnapshot) {
+          const childData = childSnapshot.val();
+          const event = {
+            title: childData.type,
+            start: childData.date,
+          };
+          if (childData.servings) {
+            events.push(event);
+          }
+          if (childData.servings) {
+            event['servings'] = childData.servings;
+            event['dish'] = childData.dish;
+          }
+        });
+        res.render('diet', {events: events});
+      });
+    }
+  });
+  
+  app.post('/diet', function(req, res) {
+    const type = req.body.type;
+    const date = req.body.date;
+    const dish = req.body.dish;
+    const servings = req.body.servings;
+    // const calories = req.body.calories;
+  
+    //store data in database
+    const currUser = req.session.userId;
+    admin.database().ref('users').child(currUser).push({
+      type: type,
+      date: date,
+      dish: dish,
+      servings: servings
+      // calories: calories
+    });
+    res.redirect('/diet');
+  });
