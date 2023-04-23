@@ -19,7 +19,7 @@ app.set('view engine', 'ejs');
 app.set('views', './views');
 
 // Start the server
-const port = process.env.PORT || 3007;
+const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
@@ -72,12 +72,17 @@ app.post('/login', (req, res) => {
 
   // SIGNUP PAGE
   app.get('/signup', (req, res) => {
-    res.render('signup');
+    res.render('signup', {message: null});
   });
 
   app.post('/signup', async (req, res) => {
     const { email, username, password } = req.body;
-    try {
+    try { 
+      // see if account exists
+      await admin.auth().getUserByEmail(email).then(() => {
+        // Email is already registered
+        res.render('signup', { message: 'Email is already registered' });
+      })
       // Create a new user account in Firebase Authentication
       const userRecord = await admin.auth().createUser({
         email,
