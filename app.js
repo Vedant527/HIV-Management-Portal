@@ -19,7 +19,7 @@ app.set('view engine', 'ejs');
 app.set('views', './views');
 
 // Start the server
-const port = process.env.PORT || 3005;
+const port = process.env.PORT || 3006;
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
@@ -166,4 +166,53 @@ app.post('/login', (req, res) => {
       time: time,
     });
     res.render('appointments');
+  });
+
+  app.get('/diet', async (req, res) => {
+    const currUser = req.session.userId;
+    const mealsRef = admin.database().ref(`meals/${currUser}`);
+    const snapshot = await mealsRef.once('value');
+  
+    const meals = [];
+    snapshot.forEach((mealSnapshot) => {
+      const meal = mealSnapshot.val();
+      meal.key = mealSnapshot.key;
+      meals.push(meal);
+    });
+  
+    meals.sort((a, b) => a.date.localeCompare(b.date));
+    res.render('diet', { meals: meals });
+  });
+  
+  app.post('/diet', async (req, res) => {
+    const currUser = req.session.userId;
+    const mealType = req.body['meal-type'];
+    const foodItem = req.body['food-item'];
+    const mealDate = req.body['meal-date'];
+
+    // Retrieve calorie count for the selected food item from the database
+    admin.database().ref('foods').child(foodItem).once('value').then((snapshot) => {
+      const calories = 100;
+
+      // Save the meal data to the database
+      admin.database().ref('meals').child(currUser).push({
+        mealType: mealType,
+        foodItem: foodItem,
+        date: mealDate,
+        calories: calories
+      });
+
+    });
+    const mealsRef = admin.database().ref(`meals/${currUser}`);
+    const snapshot = await mealsRef.once('value');
+  
+    const meals = [];
+    snapshot.forEach((mealSnapshot) => {
+      const meal = mealSnapshot.val();
+      meal.key = mealSnapshot.key;
+      meals.push(meal);
+    });
+  
+    meals.sort((a, b) => a.date.localeCompare(b.date));
+    res.render('diet', { meals: meals });
   });
