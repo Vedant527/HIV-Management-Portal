@@ -1,95 +1,256 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>HIV Management</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-3Fg0KdN6Qi0U6qN3OKPakf/96rUedXVHzhGkz+N6yOGn6+GI3xUaL6UqA6dDz+GlKXJZv2QWQ5G5y2d5mwmsPw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.0/fullcalendar.min.css" />
+	<link rel="stylesheet" href="fullcalendar.css" />
+	<script src="fullcalendar.js"></script>
+
 	<style>
-		body {
-			font-family: Arial, sans-serif;
-			margin: 0;
-			padding: 0;
-			background-color: #f5f5f5;
+		#calendar {
+			max-width: 500px;
+			margin: 0 auto;
 		}
-		header {
+	</style>  
+</head>
+<title>HIV Management</title>
+<style>
+	body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            margin: 20px;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            box-shadow: 0px 2px 2px #ccc;
+        }
+        .card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 10px;
+            padding: 20px;
+            background-color: #eee;
+            border: 1px solid #ccc;
+            box-shadow: 0px 2px 2px #ccc;
+        }
+        .card h2 {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .card p {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        .card button {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .card button:hover {
+            background-color: #444;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            text-align: left;
+            padding: 8px;
+        }
+        th {
 			background-color: #333;
-			color: #fff;
-			padding: 20px;
-			text-align: center;
-			font-size: 24px;
-			font-weight: bold;
-		}
-		.container {
-			display: flex;
-			flex-direction: row;
-			justify-content: space-between;
-			margin: 20px;
-			padding: 20px;
-			background-color: #fff;
-			border: 1px solid #ccc;
-			box-shadow: 0px 2px 2px #ccc;
-		}
-		.card {
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			justify-content: center;
-			margin: 10px;
-			padding: 20px;
-			background-color: #eee;
-			border: 1px solid #ccc;
-			box-shadow: 0px 2px 2px #ccc;
-		}
-		.card h2 {
-			font-size: 24px;
-			font-weight: bold;
-			margin-bottom: 10px;
-		}
-		.card p {
-			font-size: 18px;
-			margin-bottom: 10px;
-		}
-		.card button {
-			background-color: #333;
-			color: #fff;
-			padding: 10px;
-			border: none;
-			border-radius: 5px;
-			cursor: pointer;
-		}
-		.card button:hover {
-			background-color: #444;
-		}
-	</style>
+            color: #fff;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+		header a {
+            color: #fff;
+            text-decoration: none;
+            }
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-top: 10px;
+            margin-bottom: 30px;
+            }
+        h3 {
+            text-align: center;
+        }
+
+        form label,
+        form input {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        }
+</style>
 </head>
 <body>
-	<header>HIV Management</header>
+	<header><a href="/home">HIV Management</a></header>
 		<div class="card">
 			<h2>Exercise</h2>
 		</div>
-        <form action="/exercise" method="post">
-            <label for="exercise">Exercise:</label>
-            <select id="exercise" name="exercise">
-              <option value="walking">Walking</option>
-              <option value="running">Running</option>
-              <option value="treadmill">Treadmill</option>
-              <option value="elliptical">Elliptical</option>
-              <option value="calisthenics">Calisthenics</option>
-              <option value="pilates">Pilates</option>
-              <option value="yoga">Yoga</option>
-              <option value="swimming">Swimming</option>
-              <option value="dancing">Dancing</option>
-            </select>
-          
-            <label for="date">Date:</label>
-            <input type="date" id="date" name="date">
-          
-            <label for="length">Exercise length (in minutes):</label>
-            <input type="number" id="length" name="length">
-          
-            <label for="calories">Calories burned:</label>
-            <input type="number" id="calories" name="calories">
-          
-            <button type="submit">Submit</button>
-          </form>
-	</div>
+
+		<div id="calendar"></div>
+		
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.0/fullcalendar.min.js"></script>
+			<script>
+
+			const events = [];
+			const constants = {
+				"Walking": 5,
+				"Running": 11,
+				"Treadmill": 14,
+				"Elliptical": 10,
+				"Calisthenics": 6,
+				"Pilates": 4,
+				"Yoga": 3,
+				"Swimming": 8,
+				"Dancing": 8
+			};
+
+
+
+
+			// loop through each event and add it to the array
+			<% events.forEach(function(event) { %>
+				events.push({
+				title: '<%= event.title %>',
+				start: '<%= event.start %>',
+				length: '<%= event.length %>'
+				});
+			<% }); %>
+			
+			var table = null;
+			var tableCreated = false;
+
+			
+			$(document).ready(function() {
+				
+			$('#calendar').fullCalendar({
+				header: {
+				left: 'prev,next today',
+				center: 'title',
+				right: 'month,agendaWeek,agendaDay'
+				},
+				editable: true,
+				events: events,
+				dateClick: function(info) {
+				alert('Clicked on: ' + info.dateStr);
+			},
+			eventClick: function(calEvent, jsEvent, view) {
+				if (!tableCreated) {
+				// create a new HTML table element
+				table = document.createElement("table");
+
+				// add a header row to the table
+				var headerRow = table.insertRow();
+				var titleHeader = headerRow.insertCell();
+				titleHeader.innerHTML = "Type";
+				var startHeader = headerRow.insertCell();
+				startHeader.innerHTML = "Date";
+				var lengthHeader = headerRow.insertCell();
+				lengthHeader.innerHTML = "Length";
+				var caloriesHeader = headerRow.insertCell();
+				caloriesHeader.innerHTML = "Calories";
+				headerRow.style.backgroundColor = "#333";
+  				headerRow.style.color = "white";
+
+				// set the flag to true
+				tableCreated = true;
+			} else {
+				// clear the table content
+				table.innerHTML = "";
+				table = document.createElement("table");
+
+				// add a header row to the table
+				var headerRow = table.insertRow();
+				var titleHeader = headerRow.insertCell();
+				titleHeader.innerHTML = "Type";
+				var startHeader = headerRow.insertCell();
+				startHeader.innerHTML = "Date";
+				var lengthHeader = headerRow.insertCell();
+				lengthHeader.innerHTML = "Length";
+				var caloriesHeader = headerRow.insertCell();
+				caloriesHeader.innerHTML = "Calories";
+				headerRow.style.backgroundColor = "#333";
+  				headerRow.style.color = "white";
+
+			}
+
+			// add a data row to the table for the clicked event
+			var dataRow = table.insertRow();
+			var titleCell = dataRow.insertCell();
+			titleCell.innerHTML = calEvent.title;
+			var startCell = dataRow.insertCell();
+			startCell.innerHTML = calEvent.start.format();
+			var lengthCell = dataRow.insertCell();
+			lengthCell.innerHTML = calEvent.length || "";
+			var caloriesCell = dataRow.insertCell();
+			caloriesCell.innerHTML = calEvent.length*constants[calEvent.title];
+
+			// append the table to the document
+			// append the table to the table-container div element
+			document.getElementById("table-container").appendChild(table);
+
+    	}
+			});
+			});
+		</script>
+		  
+<div id="table-container"></div>
+<h3>Create an Exercise</h3>
+<form action="/exercise" method="post">
+	<label for="exercise">Exercise Type:</label>
+	<select id="exercise" name="exercise">
+		<option value="Walking">Walking</option>
+		<option value="Running">Running</option>
+		<option value="Treadmill">Treadmill</option>
+		<option value="Elliptical">Elliptical</option>
+		<option value="Calisthenics">Calisthenics</option>
+		<option value="Pilates">Pilates</option>
+		<option value="Yoga">Yoga</option>
+		<option value="Swimming">Swimming</option>
+		<option value="Dancing">Dancing</option>
+	</select>
+	
+	<label for="date">Date:</label>
+	<input type="date" id="date" name="date">
+	
+	<label for="length">Exercise Length (in minutes):</label>
+	<input type="number" id="length" name="length">
+	
+	<!-- <label for="calories">Calories Burned (optional):</label>
+	<input type="number" id="calories" name="calories"> -->
+	
+	<button type="submit">Submit</button>
+	</form>
+</div>
 </body>
 </html>
