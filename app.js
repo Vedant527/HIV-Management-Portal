@@ -19,7 +19,7 @@ app.set('view engine', 'ejs');
 app.set('views', './views');
 
 // Start the server
-const port = process.env.PORT || 3003;
+const port = process.env.PORT || 3005;
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
@@ -102,10 +102,33 @@ app.post('/login', (req, res) => {
     if (req.session.userId == null) {
       res.render('login');
     }
-    res.render('exercise');
+    res.render('exercise', { totalCalories: 0 });
   });
-
-  app.post('/exercise', function(req, res) {
+  async function getTotalCalories(currUser) {
+    return new Promise(async (resolve, reject) => {
+      let totalCalories = 0;
+      const uidRef = await admin.database().ref(`users/${currUser}`);
+      uidRef.once("value").then(async (snapshot) => {
+        snapshot.forEach(async (uidSnapshot) => {
+          const uid = uidSnapshot.key;
+          const caloriesRef = await admin.database().ref(`users/${currUser}/${uid}/calories`);
+          caloriesRef.once("value").then((snapshot) => {
+            const fieldValue = snapshot.val();
+            if(fieldValue != null && Number.isInteger(parseInt(fieldValue))) {
+              totalCalories += parseInt(fieldValue);
+              console.log(totalCalories);
+            }
+          });
+        });
+      }).then(() => {
+        console.log(totalCalories);
+        resolve(totalCalories);
+      }).catch((err) => {
+        reject(err);
+      });
+    });
+  }
+  app.post('/exercise', async (req, res) => {
     const exercise = req.body.exercise;
     const date = req.body.date;
     const length = req.body.length;
@@ -113,13 +136,15 @@ app.post('/login', (req, res) => {
   
     //store data in database
     const currUser = req.session.userId;
-    admin.database().ref('users').child(currUser).push({
+    await admin.database().ref('users').child(currUser).push({
       exercise: exercise,
       date: date,
       length: length,
       calories: calories
     });
-    res.render('exercise');
+    const totalCalories = await getTotalCalories(currUser);
+    console.log(totalCalories);
+    res.render('exercise', { totalCalories: totalCalories });
   });
 
   app.get('/appointments', function(req, res) {
