@@ -97,13 +97,33 @@ app.post('/login', (req, res) => {
     }
   });
 
-  // EXERCISE PAGE
   app.get('/exercise', function(req, res) {
     if (req.session.userId == null) {
       res.render('login');
+    } else {
+      const currUser = req.session.userId;
+      const events = [];
+  
+      admin.database().ref('users').child(currUser).orderByChild('date').on('value', function(snapshot) {
+        snapshot.forEach(function(childSnapshot) {
+          const childData = childSnapshot.val();
+          const event = {
+            title: childData.exercise,
+            start: childData.date
+          };
+          if (childData.calories) {
+            event['calories'] = childData.calories;
+          }
+          if (childData.length) {
+            event['length'] = childData.length;
+          }
+          events.push(event);
+        });
+        res.render('exercise', {events: events});
+      });
     }
-    res.render('exercise');
   });
+  
 
   app.post('/exercise', function(req, res) {
     const exercise = req.body.exercise;
@@ -122,23 +142,42 @@ app.post('/login', (req, res) => {
     res.render('exercise');
   });
 
+
+
+
   app.get('/appointments', function(req, res) {
     if (req.session.userId == null) {
       res.render('login');
+    } else {
+      const currUser = req.session.userId;
+      const userRef = admin.database().ref('users').child(currUser);
+  
+      userRef.orderByChild('type').on('value', function(snapshot) {
+        const appointments = [];
+        snapshot.forEach(function(childSnapshot) {
+          const childData = childSnapshot.val();
+          if (childData.hasOwnProperty('type') && childData.hasOwnProperty('date') && childData.hasOwnProperty('time')) {
+            appointments.push(childData);
+          }
+        });
+  
+        res.render('appointments', { appointments: appointments });
+      });
     }
-    res.render('appointments');
   });
+  
   app.post('/appointments', function(req, res) {
     const type = req.body.type;
     const date = req.body.date;
     const time = req.body.time;
-
-
+  
     const currUser = req.session.userId;
     admin.database().ref('users').child(currUser).push({
       type: type,
       date: date,
       time: time,
     });
-    res.render('appointments');
+  
+    res.redirect('/appointments');
   });
+  
