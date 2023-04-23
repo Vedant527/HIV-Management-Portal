@@ -19,7 +19,7 @@ app.set('view engine', 'ejs');
 app.set('views', './views');
 
 // Start the server
-const port = process.env.PORT || 3006;
+const port = process.env.PORT || 3007;
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
@@ -40,7 +40,7 @@ app.get('/', (req, res) => {
   if (req.session.userId != null) {
     res.render('home');
   } else {
-    res.render('login');
+    res.render('login', { message: null});
   }
 });
 
@@ -65,7 +65,8 @@ app.post('/login', (req, res) => {
       })
       .catch((error) => {
         console.log(error);
-        return res.render('login', { message: 'User not found' });
+        const errorMessage = 'Incorrect username or password. Please try again.';
+        return res.render('login', { message: errorMessage });
       });
   });
 
@@ -100,7 +101,7 @@ app.post('/login', (req, res) => {
   // EXERCISE PAGE
   app.get('/exercise', function(req, res) {
     if (req.session.userId == null) {
-      res.render('login');
+      res.render('login', { message: null});
     }
     res.render('exercise', { totalCalories: 0 });
   });
@@ -149,7 +150,7 @@ app.post('/login', (req, res) => {
 
   app.get('/appointments', function(req, res) {
     if (req.session.userId == null) {
-      res.render('login');
+      res.render('login', { message: null});
     }
     res.render('appointments');
   });
