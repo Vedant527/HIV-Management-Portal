@@ -13,13 +13,14 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: 'https://hiv-management-db-default-rtdb.firebaseio.com/'
 });
-
+//save custom token var
+let saveCustomToken;
 // Set the view engine to EJS and configure the views directory
 app.set('view engine', 'ejs');
 app.set('views', './views');
 
 // Start the server
-const port = process.env.PORT || 3003;
+const port = process.env.PORT || 3009;
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
@@ -34,7 +35,6 @@ app.use(session({
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-
 // LOGIN PAGE
 app.get('/', (req, res) => {
   if (req.session.userId != null) {
@@ -45,30 +45,43 @@ app.get('/', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-    const { email, password } = req.body;
-    if (!email || !password) {
-      return res.render('login', { message: 'Please provide an email and password' });
-    }
-  
-    admin.auth().getUserByEmail(email)
-      .then((userRecord) => {
-        const uid = userRecord.uid;
-        req.session.userId = uid;
-        return admin.auth().createCustomToken(uid)
-          .then((customToken) => {
-            return res.render('home', { token: customToken });
-          })
-          .catch((error) => {
-            console.log(error);
-            return res.render('login', { message: 'Error creating custom token' });
-          });
-      })
-      .catch((error) => {
-        console.log(error);
-        const errorMessage = 'Incorrect username or password. Please try again.';
-        return res.render('login', { message: errorMessage });
-      });
-  });
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return res.render('login', { message: 'Please provide an email and password' });
+  }
+  admin.auth().getUserByEmail(email)
+    .then((userRecord) => {
+      const uid = userRecord.uid;
+      admin.database().ref(`users/${uid}/password`).once('value')
+        .then((snapshot) => {
+          const actualPassword = snapshot.val();
+          if (password !== actualPassword) {
+            const errorMessage = 'Incorrect password. Please try again.';
+            return res.render('login', { message: errorMessage });
+          }
+          req.session.userId = uid;
+          return admin.auth().createCustomToken(uid)
+            .then((customToken) => {
+              saveCustomToken = customToken;
+              return res.render('home', { token: customToken });
+            })
+            .catch((error) => {
+              console.log(error);
+              return res.render('login', { message: 'Error creating custom token' });
+            });
+        })
+        .catch((error) => {
+          console.log(`Error retrieving password: ${error.message}`);
+          const errorMessage = 'Incorrect username or password. Please try again.';
+          return res.render('login', { message: errorMessage });
+        });
+    })
+    .catch((error) => {
+      console.log(error);
+      const errorMessage = 'Incorrect username. Please try again.';
+      return res.render('login', { message: errorMessage });
+    });
+});
 
 
   // SIGNUP PAGE
@@ -108,7 +121,27 @@ app.post('/login', (req, res) => {
 
   app.get('/home', (req, res) => {
     if (req.session.userId != null) {
-      res.render('home');
+
+      const currUser = req.session.userId;
+      const userRef = admin.database().ref('users').child(currUser);
+  
+      userRef.orderByChild('type').on('value', function(snapshot) {
+        const appointments = [];
+        snapshot.forEach(function(childSnapshot) {
+          const childData = childSnapshot.val();
+          if (childData.hasOwnProperty('type') && childData.hasOwnProperty('date') && childData.hasOwnProperty('time')) {
+            appointments.push(childData);
+          }
+        });
+        let upcomingAppointment;
+        if (appointments.length == 0) {
+          upcomingAppointment = null
+        } else {
+          upcomingAppointment = []
+          upcomingAppointment.push(appointments[appointments.length - 1]);
+        }
+        res.render('home', { apt: upcomingAppointment });
+      });
     } else {
       res.render('login', { message: null});
     }
@@ -286,4 +319,22 @@ app.post('/login', (req, res) => {
       // calories: calories
     });
     res.redirect('/diet');
+  });
+  app.post('/homepage', (req, res) => {
+    req.session.destroy(err => {
+      if (err) {
+        console.log(err);
+      } else {
+        return res.render('home');
+      }
+    });
+  });
+  app.post('/logout', (req, res) => {
+    req.session.destroy(err => {
+      if (err) {
+        console.log(err);
+      } else {
+        return res.render('login', { message: null });
+      }
+    });
   });
