@@ -127,14 +127,14 @@ app.get('/home', (req, res) => {
   if (req.session.userId != null) {
     res.render('home');
   } else {
-    res.render('login', { message: null});
+    res.render('login', { message: "Login to access your user dashboard!"});
   }
 });
 
 // EXERCISE PAGE
 app.get('/exercise', function(req, res) {
   if (req.session.userId == null) {
-    res.render('login', { message: null});
+    res.render('login', { message: "Login to access the exercise page!"});
   } else {
     const currUser = req.session.userId;
     const events = [];
@@ -258,7 +258,7 @@ app.post('/appointments', function(req, res) {
 // DIET PAGE
 app.get('/diet', function(req, res) {
   if (req.session.userId == null) {
-    res.render('login', { message: null});
+    res.render('login', { message: "Login to access the diet page!"});
   } else {
     const currUser = req.session.userId;
     const events = [];
