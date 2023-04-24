@@ -121,27 +121,7 @@ app.post('/login', (req, res) => {
 
   app.get('/home', (req, res) => {
     if (req.session.userId != null) {
-
-      const currUser = req.session.userId;
-      const userRef = admin.database().ref('users').child(currUser);
-  
-      userRef.orderByChild('type').on('value', function(snapshot) {
-        const appointments = [];
-        snapshot.forEach(function(childSnapshot) {
-          const childData = childSnapshot.val();
-          if (childData.hasOwnProperty('type') && childData.hasOwnProperty('date') && childData.hasOwnProperty('time')) {
-            appointments.push(childData);
-          }
-        });
-        let upcomingAppointment;
-        if (appointments.length == 0) {
-          upcomingAppointment = null
-        } else {
-          upcomingAppointment = []
-          upcomingAppointment.push(appointments[appointments.length - 1]);
-        }
-        res.render('home', { apt: upcomingAppointment });
-      });
+      res.render('home');
     } else {
       res.render('login', { message: null});
     }
