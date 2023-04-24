@@ -78,10 +78,11 @@
 
         <label for="password">Password</label>
         <input type="password" id="password" name="password" required>
+        <% if (message) { %>
+          <p class="error-message"><%= message %></p>
+        <% } %>    
         <button type="submit">Sign up</button>
       </form>
-      <% if (message) { %>
-        <p class="error-message"><%= message %></p>
-      <% } %>      
+  
   </body>
 </html>
