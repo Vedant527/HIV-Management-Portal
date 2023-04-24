@@ -40,7 +40,7 @@ app.get('/', (req, res) => {
   if (req.session.userId != null) {
     res.render('home');
   } else {
-    res.render('login');
+    res.render('login', { message: null});
   }
 });
 
@@ -65,18 +65,25 @@ app.post('/login', (req, res) => {
       })
       .catch((error) => {
         console.log(error);
-        return res.render('login', { message: 'User not found' });
+        const errorMessage = 'Incorrect username or password. Please try again.';
+        return res.render('login', { message: errorMessage });
       });
   });
 
+
   // SIGNUP PAGE
   app.get('/signup', (req, res) => {
-    res.render('signup');
+    res.render('signup', {message: null});
   });
 
   app.post('/signup', async (req, res) => {
     const { email, username, password } = req.body;
-    try {
+    try { 
+      // see if account exists
+      await admin.auth().getUserByEmail(email).then(() => {
+        // Email is already registered
+        res.render('signup', { message: 'Email is already registered' });
+      })
       // Create a new user account in Firebase Authentication
       const userRecord = await admin.auth().createUser({
         email,
@@ -97,9 +104,23 @@ app.post('/login', (req, res) => {
     }
   });
 
+  // HOME PAGE
+
+  app.get('/home', (req, res) => {
+    if (req.session.userId != null) {
+      res.render('home');
+    } else {
+      res.render('login', { message: null});
+    }
+  });
+
+
+
+
+  // EXERCISE PAGE
   app.get('/exercise', function(req, res) {
     if (req.session.userId == null) {
-      res.render('login');
+      res.render('login', { message: null});
     } else {
       const currUser = req.session.userId;
       const events = [];
@@ -111,43 +132,43 @@ app.post('/login', (req, res) => {
             title: childData.exercise,
             start: childData.date
           };
-          if (childData.calories) {
-            event['calories'] = childData.calories;
+          if (childData.exercise) {
+            events.push(event);
+            // event['calories'] = childData.calories;
           }
           if (childData.length) {
             event['length'] = childData.length;
           }
-          events.push(event);
+          // events.push(event);
         });
         res.render('exercise', {events: events});
       });
     }
   });
   
-
   app.post('/exercise', function(req, res) {
     const exercise = req.body.exercise;
     const date = req.body.date;
     const length = req.body.length;
-    const calories = req.body.calories;
+    // const calories = req.body.calories;
   
     //store data in database
     const currUser = req.session.userId;
     admin.database().ref('users').child(currUser).push({
       exercise: exercise,
       date: date,
-      length: length,
-      calories: calories
+      length: length
+      // calories: calories
     });
-    res.render('exercise');
+    res.redirect('/exercise');
   });
 
 
 
-
+// APPOINTMENTS PAGE
   app.get('/appointments', function(req, res) {
     if (req.session.userId == null) {
-      res.render('login');
+      res.render('login', { message: null});
     } else {
       const currUser = req.session.userId;
       const userRef = admin.database().ref('users').child(currUser);
@@ -160,8 +181,8 @@ app.post('/login', (req, res) => {
             appointments.push(childData);
           }
         });
-  
-        res.render('appointments', { appointments: appointments });
+        var message = '';
+        res.render('appointments', { appointments: appointments, message: message });
       });
     }
   });
@@ -170,14 +191,99 @@ app.post('/login', (req, res) => {
     const type = req.body.type;
     const date = req.body.date;
     const time = req.body.time;
+    const currUser = req.session.userId;
+    const appointmentsRef = admin.database().ref('users').child(currUser);
+    let exists = false;
   
+    appointmentsRef.orderByChild('date').equalTo(date).once('value', function(snapshot) {
+      snapshot.forEach(function(childSnapshot) {
+        const childData = childSnapshot.val();
+        if (childData.hasOwnProperty('type') && childData.hasOwnProperty('date') && childData.hasOwnProperty('time')) {
+          if (childData.type === type && childData.time === time && childData.date === date) {
+            exists = true;
+          }
+        }
+      });
+      if (exists) {
+        const appointments = [];
+        appointmentsRef.orderByChild('date').on('value', function(snapshot) {
+          snapshot.forEach(function(childSnapshot) {
+            const childData = childSnapshot.val();
+            if (childData.hasOwnProperty('type') && childData.hasOwnProperty('date') && childData.hasOwnProperty('time')) {
+              appointments.push(childData);
+            }
+          });
+          res.render('appointments', { appointments: appointments, message: "Appointment already exists" });
+        });
+      } else {
+        appointmentsRef.push({
+          type: type,
+          date: date,
+          time: time,
+        }, function(error) {
+          if (error) {
+            console.log("Error adding appointment:", error);
+          } else {
+            const appointments = [];
+            appointmentsRef.orderByChild('date').on('value', function(snapshot) {
+              snapshot.forEach(function(childSnapshot) {
+                const childData = childSnapshot.val();
+                if (childData.hasOwnProperty('type') && childData.hasOwnProperty('date') && childData.hasOwnProperty('time')) {
+                  appointments.push(childData);
+                }
+              });
+              res.render('appointments', { appointments: appointments, message: "Appointment successfully created" });
+            });
+          }
+        });
+      }
+    });
+  });
+  
+
+   // DIET PAGE
+   app.get('/diet', function(req, res) {
+    if (req.session.userId == null) {
+      res.render('login', { message: null});
+    } else {
+      const currUser = req.session.userId;
+      const events = [];
+  
+      admin.database().ref('users').child(currUser).orderByChild('date').on('value', function(snapshot) {
+        snapshot.forEach(function(childSnapshot) {
+          const childData = childSnapshot.val();
+          const event = {
+            title: childData.type,
+            start: childData.date,
+          };
+          if (childData.servings) {
+            events.push(event);
+          }
+          if (childData.servings) {
+            event['servings'] = childData.servings;
+            event['dish'] = childData.dish;
+          }
+        });
+        res.render('diet', {events: events});
+      });
+    }
+  });
+  
+  app.post('/diet', function(req, res) {
+    const type = req.body.type;
+    const date = req.body.date;
+    const dish = req.body.dish;
+    const servings = req.body.servings;
+    // const calories = req.body.calories;
+  
+    //store data in database
     const currUser = req.session.userId;
     admin.database().ref('users').child(currUser).push({
       type: type,
       date: date,
-      time: time,
+      dish: dish,
+      servings: servings
+      // calories: calories
     });
-  
-    res.redirect('/appointments');
+    res.redirect('/diet');
   });
-  
