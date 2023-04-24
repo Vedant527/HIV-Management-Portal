@@ -13,7 +13,8 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: 'https://hiv-management-db-default-rtdb.firebaseio.com/'
 });
-
+//save custom token var
+let saveCustomToken;
 // Set the view engine to EJS and configure the views directory
 app.set('view engine', 'ejs');
 app.set('views', './views');
@@ -38,187 +39,353 @@ app.use(bodyParser.json());
 // LOGIN PAGE
 app.get('/', (req, res) => {
   if (req.session.userId != null) {
-    res.render('home');
+    const username = req.session.username;
+    res.render('home', { username: username });
   } else {
     res.render('login', { message: null});
   }
 });
 
+// app.post('/login', (req, res) => {
+//   const { email, password } = req.body;
+//   if (!email || !password) {
+//     return res.render('login', { message: 'Please provide an email and password' });
+//   }
+//   admin.auth().getUserByEmail(email)
+//     .then((userRecord) => {
+//       const uid = userRecord.uid;
+//       admin.database().ref(`users/${uid}/password`).once('value')
+//         .then((snapshot) => {
+//           const actualPassword = snapshot.val();
+//           if (password !== actualPassword) {
+//             const errorMessage = 'Incorrect password. Please try again.';
+//             return res.render('login', { message: errorMessage });
+//           }
+//           req.session.userId = uid;
+//           return admin.auth().createCustomToken(uid)
+//             .then((customToken) => {
+//               saveCustomToken = customToken;
+//               return res.render('home', { token: customToken });
+//             })
+//             .catch((error) => {
+//               console.log(error);
+//               return res.render('login', { message: 'Error creating custom token' });
+//             });
+//         })
+//         .catch((error) => {
+//           console.log(`Error retrieving password: ${error.message}`);
+//           const errorMessage = 'Incorrect username or password. Please try again.';
+//           return res.render('login', { message: errorMessage });
+//         });
+//     })
+//     .catch((error) => {
+//       console.log(error);
+//       const errorMessage = 'Incorrect username. Please try again.';
+//       return res.render('login', { message: errorMessage });
+//     });
+// });
+
+
+
 app.post('/login', (req, res) => {
-    const { email, password } = req.body;
-    if (!email || !password) {
-      return res.render('login', { message: 'Please provide an email and password' });
-    }
-  
-    admin.auth().getUserByEmail(email)
-      .then((userRecord) => {
-        const uid = userRecord.uid;
-        req.session.userId = uid;
-        return admin.auth().createCustomToken(uid)
-          .then((customToken) => {
-            return res.render('home', { token: customToken });
-          })
-          .catch((error) => {
-            console.log(error);
-            return res.render('login', { message: 'Error creating custom token' });
-          });
-      })
-      .catch((error) => {
-        console.log(error);
-        const errorMessage = 'Incorrect username or password. Please try again.';
-        return res.render('login', { message: errorMessage });
-      });
-  });
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return res.render('login', { message: 'Please provide an email and password' });
+  }
+  admin.auth().getUserByEmail(email)
+    .then((userRecord) => {
+      const uid = userRecord.uid;
+      admin.database().ref(`users/${uid}`).once('value')
+        .then((snapshot) => {
+          const userData = snapshot.val();
+          const actualPassword = userData.password;
+          if (password !== actualPassword) {
+            const errorMessage = 'Incorrect password. Please try again.';
+            return res.render('login', { message: errorMessage });
+          }
+          req.session.userId = uid;
+          return admin.auth().createCustomToken(uid)
+            .then((customToken) => {
+              saveCustomToken = customToken;
+              return res.render('home', { 
+                token: customToken, 
+                username: userData.username 
+              });
+            })
+            .catch((error) => {
+              console.log(error);
+              return res.render('login', { message: 'Error creating custom token' });
+            });
+        })
+        .catch((error) => {
+          console.log(`Error retrieving user data: ${error.message}`);
+          const errorMessage = 'Incorrect username or password. Please try again.';
+          return res.render('login', { message: errorMessage });
+        });
+    })
+    .catch((error) => {
+      console.log(error);
+      const errorMessage = 'Incorrect username. Please try again.';
+      return res.render('login', { message: errorMessage });
+    });
+});
 
-  // SIGNUP PAGE
-  app.get('/signup', (req, res) => {
-    res.render('signup', {message: null});
-  });
 
-  app.post('/signup', async (req, res) => {
-    const { email, username, password } = req.body;
-    try { 
-      // see if account exists
+
+// SIGNUP PAGE
+app.get('/signup', (req, res) => {
+  res.render('signup', {message: null});
+});
+
+app.post('/signup', async (req, res) => {
+  const { email, username, password } = req.body;
+  try { 
+    // see if account exists
+    try {
       await admin.auth().getUserByEmail(email).then(() => {
         // Email is already registered
         res.render('signup', { message: 'Email is already registered' });
       })
-      // Create a new user account in Firebase Authentication
-      const userRecord = await admin.auth().createUser({
-        email,
-        password
-      });
-      
-      // Store the user's email, username, and password in the Firebase Realtime Database
-      await admin.database().ref('users').child(userRecord.uid).set({
-        email,
-        username,
-        password
-      });
-  
-      res.send('User account created successfully!');
-    } catch (error) {
-      console.error(error);
-      res.status(500).send('Error creating user account');
+    } catch (e) {
     }
-  });
+    // Create a new user account in Firebase Authentication
+    const userRecord = await admin.auth().createUser({
+      email,
+      password
+    });
+    
+    // Store the user's email, username, and password in the Firebase Realtime Database
+    await admin.database().ref('users').child(userRecord.uid).set({
+      email,
+      username,
+      password
+    });
 
-  // EXERCISE PAGE
-  app.get('/exercise', function(req, res) {
-    if (req.session.userId == null) {
-      res.render('login', { message: null});
-    }
-    res.render('exercise', { totalCalories: 0 });
-  });
-  async function getTotalCalories(currUser) {
-    return new Promise(async (resolve, reject) => {
-      let totalCalories = 0;
-      const uidRef = await admin.database().ref(`users/${currUser}`);
-      uidRef.once("value").then(async (snapshot) => {
-        snapshot.forEach(async (uidSnapshot) => {
-          const uid = uidSnapshot.key;
-          const caloriesRef = await admin.database().ref(`users/${currUser}/${uid}/calories`);
-          caloriesRef.once("value").then((snapshot) => {
-            const fieldValue = snapshot.val();
-            if(fieldValue != null && Number.isInteger(parseInt(fieldValue))) {
-              totalCalories += parseInt(fieldValue);
-              console.log(totalCalories);
-            }
-          });
-        });
-      }).then(() => {
-        console.log(totalCalories);
-        resolve(totalCalories);
-      }).catch((err) => {
-        reject(err);
+    res.render('login', { message: 'Account created successfully' });
+  } catch (error) {
+    console.error(error);
+    res.render('signup', { message: 'Email is already registered' });
+  }
+});
+
+
+  // HOME PAGE
+  
+app.get('/home', (req, res) => {
+  if (req.session.userId != null) {
+    const uid = req.session.userId;
+    admin.database().ref(`users/${uid}/username`).once('value')
+      .then((snapshot) => {
+        const username = snapshot.val();
+        res.render('home', { username: username });
+      })
+      .catch((error) => {
+        console.log(`Error retrieving username: ${error.message}`);
+        res.render('home', { username: null });
       });
+  } else {
+    res.render('login', { message: null });
+  }
+});
+
+
+
+
+
+
+  
+  
+
+
+
+
+// EXERCISE PAGE
+app.get('/exercise', function(req, res) {
+  if (req.session.userId == null) {
+    res.render('login', { message: "Login to access the exercise page!"});
+  } else {
+    const currUser = req.session.userId;
+    const events = [];
+
+    admin.database().ref('users').child(currUser).orderByChild('date').on('value', function(snapshot) {
+      snapshot.forEach(function(childSnapshot) {
+        const childData = childSnapshot.val();
+        const event = {
+          title: childData.exercise,
+          start: childData.date
+        };
+        if (childData.exercise) {
+          events.push(event);
+          // event['calories'] = childData.calories;
+        }
+        if (childData.length) {
+          event['length'] = childData.length;
+        }
+        // events.push(event);
+      });
+      res.render('exercise', {events: events});
     });
   }
-  app.post('/exercise', async (req, res) => {
-    const exercise = req.body.exercise;
-    const date = req.body.date;
-    const length = req.body.length;
-    const calories = req.body.calories;
-  
-    //store data in database
-    const currUser = req.session.userId;
-    await admin.database().ref('users').child(currUser).push({
-      exercise: exercise,
-      date: date,
-      length: length,
-      calories: calories
-    });
-    const totalCalories = await getTotalCalories(currUser);
-    console.log(totalCalories);
-    res.render('exercise', { totalCalories: totalCalories });
+});
+
+app.post('/exercise', function(req, res) {
+  const exercise = req.body.exercise;
+  const date = req.body.date;
+  const length = req.body.length;
+  // const calories = req.body.calories;
+
+  //store data in database
+  const currUser = req.session.userId;
+  admin.database().ref('users').child(currUser).push({
+    exercise: exercise,
+    date: date,
+    length: length
+    // calories: calories
   });
-
-  app.get('/appointments', function(req, res) {
-    if (req.session.userId == null) {
-      res.render('login', { message: null});
-    }
-    res.render('appointments');
-  });
-  app.post('/appointments', function(req, res) {
-    const type = req.body.type;
-    const date = req.body.date;
-    const time = req.body.time;
+  res.redirect('/exercise');
+});
 
 
+
+// APPOINTMENTS PAGE
+app.get('/appointments', function(req, res) {
+  if (req.session.userId == null) {
+    res.render('login', { message: "Login to access the appointments page!"});
+  } else {
     const currUser = req.session.userId;
-    admin.database().ref('users').child(currUser).push({
-      type: type,
-      date: date,
-      time: time,
-    });
-    res.render('appointments');
-  });
+    const userRef = admin.database().ref('users').child(currUser);
 
-  app.get('/diet', async (req, res) => {
-    const currUser = req.session.userId;
-    const mealsRef = admin.database().ref(`meals/${currUser}`);
-    const snapshot = await mealsRef.once('value');
-  
-    const meals = [];
-    snapshot.forEach((mealSnapshot) => {
-      const meal = mealSnapshot.val();
-      meal.key = mealSnapshot.key;
-      meals.push(meal);
-    });
-  
-    meals.sort((a, b) => a.date.localeCompare(b.date));
-    res.render('diet', { meals: meals });
-  });
-  
-  app.post('/diet', async (req, res) => {
-    const currUser = req.session.userId;
-    const mealType = req.body['meal-type'];
-    const foodItem = req.body['food-item'];
-    const mealDate = req.body['meal-date'];
-
-    // Retrieve calorie count for the selected food item from the database
-    admin.database().ref('foods').child(foodItem).once('value').then((snapshot) => {
-      const calories = 100;
-
-      // Save the meal data to the database
-      admin.database().ref('meals').child(currUser).push({
-        mealType: mealType,
-        foodItem: foodItem,
-        date: mealDate,
-        calories: calories
+    userRef.orderByChild('type').on('value', function(snapshot) {
+      const appointments = [];
+      snapshot.forEach(function(childSnapshot) {
+        const childData = childSnapshot.val();
+        if (childData.hasOwnProperty('type') && childData.hasOwnProperty('date') && childData.hasOwnProperty('time')) {
+          appointments.push(childData);
+        }
       });
+      var message = '';
+      res.render('appointments', { appointments: appointments, message: message });
+    });
+  }
+});
 
+app.post('/appointments', function(req, res) {
+  const type = req.body.type;
+  const date = req.body.date;
+  const time = req.body.time;
+  const currUser = req.session.userId;
+  const appointmentsRef = admin.database().ref('users').child(currUser);
+  let exists = false;
+
+  appointmentsRef.orderByChild('date').equalTo(date).once('value', function(snapshot) {
+    snapshot.forEach(function(childSnapshot) {
+      const childData = childSnapshot.val();
+      if (childData.hasOwnProperty('type') && childData.hasOwnProperty('date') && childData.hasOwnProperty('time')) {
+        if (childData.type === type && childData.time === time && childData.date === date) {
+          exists = true;
+        }
+      }
     });
-    const mealsRef = admin.database().ref(`meals/${currUser}`);
-    const snapshot = await mealsRef.once('value');
-  
-    const meals = [];
-    snapshot.forEach((mealSnapshot) => {
-      const meal = mealSnapshot.val();
-      meal.key = mealSnapshot.key;
-      meals.push(meal);
-    });
-  
-    meals.sort((a, b) => a.date.localeCompare(b.date));
-    res.render('diet', { meals: meals });
+    if (exists) {
+      const appointments = [];
+      appointmentsRef.orderByChild('date').on('value', function(snapshot) {
+        snapshot.forEach(function(childSnapshot) {
+          const childData = childSnapshot.val();
+          if (childData.hasOwnProperty('type') && childData.hasOwnProperty('date') && childData.hasOwnProperty('time')) {
+            appointments.push(childData);
+          }
+        });
+        res.render('appointments', { appointments: appointments, message: "Appointment already exists" });
+      });
+    } else {
+      appointmentsRef.push({
+        type: type,
+        date: date,
+        time: time,
+      }, function(error) {
+        if (error) {
+          console.log("Error adding appointment:", error);
+        } else {
+          const appointments = [];
+          appointmentsRef.orderByChild('date').on('value', function(snapshot) {
+            snapshot.forEach(function(childSnapshot) {
+              const childData = childSnapshot.val();
+              if (childData.hasOwnProperty('type') && childData.hasOwnProperty('date') && childData.hasOwnProperty('time')) {
+                appointments.push(childData);
+              }
+            });
+            res.render('appointments', { appointments: appointments, message: "Appointment successfully created" });
+          });
+        }
+      });
+    }
   });
+});
+
+
+// DIET PAGE
+app.get('/diet', function(req, res) {
+  if (req.session.userId == null) {
+    res.render('login', { message: "Login to access the diet page!"});
+  } else {
+    const currUser = req.session.userId;
+    const events = [];
+
+    admin.database().ref('users').child(currUser).orderByChild('date').on('value', function(snapshot) {
+      snapshot.forEach(function(childSnapshot) {
+        const childData = childSnapshot.val();
+        const event = {
+          title: childData.type,
+          start: childData.date,
+        };
+        if (childData.servings) {
+          events.push(event);
+        }
+        if (childData.servings) {
+          event['servings'] = childData.servings;
+          event['dish'] = childData.dish;
+        }
+      });
+      res.render('diet', {events: events});
+    });
+  }
+});
+
+app.post('/diet', function(req, res) {
+  const type = req.body.type;
+  const date = req.body.date;
+  const dish = req.body.dish;
+  const servings = req.body.servings;
+  // const calories = req.body.calories;
+
+  //store data in database
+  const currUser = req.session.userId;
+  admin.database().ref('users').child(currUser).push({
+    type: type,
+    date: date,
+    dish: dish,
+    servings: servings
+    // calories: calories
+  });
+  res.redirect('/diet');
+});
+// app.post('/homepage', (req, res) => {
+//   // req.session.destroy(err => {
+//   //   if (err) {
+//   //     console.log(err);
+//   //   } else {
+//   //     return res.render('home');
+//   //   }
+//   // });
+//   res.redirect('/home')
+// });
+// app.post('/logout', (req, res) => {
+//   req.session.userId = null;
+//   req.session.destroy(err => {
+//     if (err) {
+//       console.log(err);
+//     } else {
+//       return res.render('login', { message: "You are now logged out!"});
+//     }
+//   });
+// });

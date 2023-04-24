@@ -1,7 +1,8 @@
 <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
-    <title>HIV Management</title>
+    <title>HIV Management Portal</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -58,19 +59,84 @@
         .card button:hover {
             background-color: #444;
         }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            text-align: left;
+            padding: 8px;
+        }
+        th {
+            background-color: #333;
+            color: #fff;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        header a {
+            color: #fff;
+            text-decoration: none;
+            }
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-top: 10px;
+            margin-bottom: 30px;
+            }
+        h3 {
+            text-align: center;
+        }
+
+        form label,
+        form input {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
-    <header>HIV Management</header>
+    <header><a href="/home?username={{username}}">HIV Management Portal</a></header>
+    <!-- <form action="/homepage" method="POST">
+		<button type="submit">Home Page</button>
+	</form>
+    <form action="/logout" method="POST">
+		<button type="submit">Logout</button>
+	</form> -->
         <div class="card">
             <h2>Appointments</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% appointments.sort((a, b) => new Date(b.date) - new Date(a.date) || b.time.localeCompare(a.time)).forEach(function(appointment) { %>
+                        <tr>
+                            <td><%= appointment.type %></td>
+                            <td><%= appointment.date %></td>
+                            <td><%= appointment.time %></td>
+                        </tr>
+                    <% }); %>
+                </tbody>         
+            </table>
+            <% if (message) { %>
+                <p><%= message %></p>
+              <% } %>
         </div>
+        
+        <h3>Create an Appointment</h3>
         <form action="/appointments" method="post">
             <label for="type">Appointment Type:</label>
             <select id="type" name="type">
-              <option value="doctor">Doctor</option>
-              <option value="lab">Lab</option>
-              <option value="nutriotionist">Nutritionist</option>
+              <option value="Doctor">Doctor</option>
+              <option value="Lab">Lab</option>
+              <option value="Nutritionist">Nutritionist</option>
             </select>
           
             <label for="date">Date:</label>
