@@ -39,11 +39,53 @@ app.use(bodyParser.json());
 // LOGIN PAGE
 app.get('/', (req, res) => {
   if (req.session.userId != null) {
-    res.render('home');
+    const username = req.session.username;
+    res.render('home', { username: username });
   } else {
     res.render('login', { message: null});
   }
 });
+
+// app.post('/login', (req, res) => {
+//   const { email, password } = req.body;
+//   if (!email || !password) {
+//     return res.render('login', { message: 'Please provide an email and password' });
+//   }
+//   admin.auth().getUserByEmail(email)
+//     .then((userRecord) => {
+//       const uid = userRecord.uid;
+//       admin.database().ref(`users/${uid}/password`).once('value')
+//         .then((snapshot) => {
+//           const actualPassword = snapshot.val();
+//           if (password !== actualPassword) {
+//             const errorMessage = 'Incorrect password. Please try again.';
+//             return res.render('login', { message: errorMessage });
+//           }
+//           req.session.userId = uid;
+//           return admin.auth().createCustomToken(uid)
+//             .then((customToken) => {
+//               saveCustomToken = customToken;
+//               return res.render('home', { token: customToken });
+//             })
+//             .catch((error) => {
+//               console.log(error);
+//               return res.render('login', { message: 'Error creating custom token' });
+//             });
+//         })
+//         .catch((error) => {
+//           console.log(`Error retrieving password: ${error.message}`);
+//           const errorMessage = 'Incorrect username or password. Please try again.';
+//           return res.render('login', { message: errorMessage });
+//         });
+//     })
+//     .catch((error) => {
+//       console.log(error);
+//       const errorMessage = 'Incorrect username. Please try again.';
+//       return res.render('login', { message: errorMessage });
+//     });
+// });
+
+
 
 app.post('/login', (req, res) => {
   const { email, password } = req.body;
@@ -53,9 +95,10 @@ app.post('/login', (req, res) => {
   admin.auth().getUserByEmail(email)
     .then((userRecord) => {
       const uid = userRecord.uid;
-      admin.database().ref(`users/${uid}/password`).once('value')
+      admin.database().ref(`users/${uid}`).once('value')
         .then((snapshot) => {
-          const actualPassword = snapshot.val();
+          const userData = snapshot.val();
+          const actualPassword = userData.password;
           if (password !== actualPassword) {
             const errorMessage = 'Incorrect password. Please try again.';
             return res.render('login', { message: errorMessage });
@@ -64,7 +107,10 @@ app.post('/login', (req, res) => {
           return admin.auth().createCustomToken(uid)
             .then((customToken) => {
               saveCustomToken = customToken;
-              return res.render('home', { token: customToken });
+              return res.render('home', { 
+                token: customToken, 
+                username: userData.username 
+              });
             })
             .catch((error) => {
               console.log(error);
@@ -72,7 +118,7 @@ app.post('/login', (req, res) => {
             });
         })
         .catch((error) => {
-          console.log(`Error retrieving password: ${error.message}`);
+          console.log(`Error retrieving user data: ${error.message}`);
           const errorMessage = 'Incorrect username or password. Please try again.';
           return res.render('login', { message: errorMessage });
         });
@@ -83,6 +129,7 @@ app.post('/login', (req, res) => {
       return res.render('login', { message: errorMessage });
     });
 });
+
 
 
   // SIGNUP PAGE
@@ -122,14 +169,31 @@ app.post('/login', (req, res) => {
   });
 
   // HOME PAGE
+  
+app.get('/home', (req, res) => {
+  if (req.session.userId != null) {
+    const uid = req.session.userId;
+    admin.database().ref(`users/${uid}/username`).once('value')
+      .then((snapshot) => {
+        const username = snapshot.val();
+        res.render('home', { username: username });
+      })
+      .catch((error) => {
+        console.log(`Error retrieving username: ${error.message}`);
+        res.render('home', { username: null });
+      });
+  } else {
+    res.render('login', { message: null });
+  }
+});
 
-  app.get('/home', (req, res) => {
-    if (req.session.userId != null) {
-      res.render('home');
-    } else {
-      res.render('login', { message: null});
-    }
-  });
+
+
+
+
+
+  
+  
 
 
 
@@ -304,21 +368,22 @@ app.post('/login', (req, res) => {
     });
     res.redirect('/diet');
   });
-  app.post('/homepage', (req, res) => {
-    req.session.destroy(err => {
-      if (err) {
-        console.log(err);
-      } else {
-        return res.render('home');
-      }
-    });
-  });
-  app.post('/logout', (req, res) => {
-    req.session.destroy(err => {
-      if (err) {
-        console.log(err);
-      } else {
-        return res.render('login', { message: null });
-      }
-    });
-  });
+
+  // app.post('/homepage', (req, res) => {
+  //   req.session.destroy(err => {
+  //     if (err) {
+  //       console.log(err);
+  //     } else {
+  //       return res.render('home');
+  //     }
+  //   });
+  // });
+  // app.post('/logout', (req, res) => {
+  //   req.session.destroy(err => {
+  //     if (err) {
+  //       console.log(err);
+  //     } else {
+  //       return res.render('login', { message: null });
+  //     }
+  //   });
+  // });

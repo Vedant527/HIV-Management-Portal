@@ -17,6 +17,12 @@
 			font-size: 24px;
 			font-weight: bold;
 		}
+		
+		h4 {
+			margin-right: 20px;
+			text-align: right;
+		}
+
 		.container {
 			display: flex;
 			flex-direction: row;
@@ -65,13 +71,24 @@
 			width: 200px; /* set a fixed width */
 			height: 40px; /* set a fixed height */
 		}
+		.login-btn {
+			margin-left: 1220px;
+			margin-right: 20px;
+		}
+
 	</style>
 </head>
 <body>
 	<header>HIV Management Portal</header>
-	<form action="/logout" method="POST">
-		<button type="submit">Logout</button>
-	</form>
+
+	<div>
+		<h4>Welcome <%= username %>!</h4>
+		<form action="/login" method="POST">
+			<button type="submit" class="login-btn">Login</button>
+		  </form>
+		  
+</div>
+	
 	<div class="container">
 		<div class="card">
             <h2>Appointments</h2>
