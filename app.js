@@ -312,12 +312,12 @@ app.post('/homepage', (req, res) => {
   res.redirect('/home')
 });
 app.post('/logout', (req, res) => {
+  req.session.userId = null;
   req.session.destroy(err => {
     if (err) {
       console.log(err);
     } else {
-      req.session.userId = null;
-      return res.render('login', { message: null });
+      return res.render('login', { message: "You are now logged out!"});
     }
   });
 });
