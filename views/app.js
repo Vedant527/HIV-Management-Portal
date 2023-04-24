@@ -19,7 +19,7 @@ app.set('view engine', 'ejs');
 app.set('views', './views');
 
 // Start the server
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3003;
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
@@ -121,7 +121,6 @@ app.post('/login', (req, res) => {
   app.get('/exercise', function(req, res) {
     if (req.session.userId == null) {
       res.render('login', { message: null});
-<<<<<<< HEAD
     } else {
       const currUser = req.session.userId;
       const events = [];
@@ -148,36 +147,6 @@ app.post('/login', (req, res) => {
   });
   
   app.post('/exercise', function(req, res) {
-=======
-    }
-    res.render('exercise', { totalCalories: 0 });
-  });
-  async function getTotalCalories(currUser) {
-    return new Promise(async (resolve, reject) => {
-      let totalCalories = 0;
-      const uidRef = await admin.database().ref(`users/${currUser}`);
-      uidRef.once("value").then(async (snapshot) => {
-        snapshot.forEach(async (uidSnapshot) => {
-          const uid = uidSnapshot.key;
-          const caloriesRef = await admin.database().ref(`users/${currUser}/${uid}/calories`);
-          caloriesRef.once("value").then((snapshot) => {
-            const fieldValue = snapshot.val();
-            if(fieldValue != null && Number.isInteger(parseInt(fieldValue))) {
-              totalCalories += parseInt(fieldValue);
-              console.log(totalCalories);
-            }
-          });
-        });
-      }).then(() => {
-        console.log(totalCalories);
-        resolve(totalCalories);
-      }).catch((err) => {
-        reject(err);
-      });
-    });
-  }
-  app.post('/exercise', async (req, res) => {
->>>>>>> origin/main
     const exercise = req.body.exercise;
     const date = req.body.date;
     const length = req.body.length;
@@ -185,19 +154,13 @@ app.post('/login', (req, res) => {
   
     //store data in database
     const currUser = req.session.userId;
-    await admin.database().ref('users').child(currUser).push({
+    admin.database().ref('users').child(currUser).push({
       exercise: exercise,
       date: date,
       length: length
       // calories: calories
     });
-<<<<<<< HEAD
     res.redirect('/exercise');
-=======
-    const totalCalories = await getTotalCalories(currUser);
-    console.log(totalCalories);
-    res.render('exercise', { totalCalories: totalCalories });
->>>>>>> origin/main
   });
 
 
@@ -206,7 +169,6 @@ app.post('/login', (req, res) => {
   app.get('/appointments', function(req, res) {
     if (req.session.userId == null) {
       res.render('login', { message: null});
-<<<<<<< HEAD
     } else {
       const currUser = req.session.userId;
       const userRef = admin.database().ref('users').child(currUser);
@@ -222,8 +184,6 @@ app.post('/login', (req, res) => {
         var message = '';
         res.render('appointments', { appointments: appointments, message: message });
       });
-=======
->>>>>>> origin/main
     }
   });
   
@@ -325,59 +285,5 @@ app.post('/login', (req, res) => {
       servings: servings
       // calories: calories
     });
-<<<<<<< HEAD
     res.redirect('/diet');
   });
-=======
-    res.render('appointments');
-  });
-
-  app.get('/diet', async (req, res) => {
-    const currUser = req.session.userId;
-    const mealsRef = admin.database().ref(`meals/${currUser}`);
-    const snapshot = await mealsRef.once('value');
-  
-    const meals = [];
-    snapshot.forEach((mealSnapshot) => {
-      const meal = mealSnapshot.val();
-      meal.key = mealSnapshot.key;
-      meals.push(meal);
-    });
-  
-    meals.sort((a, b) => a.date.localeCompare(b.date));
-    res.render('diet', { meals: meals });
-  });
-  
-  app.post('/diet', async (req, res) => {
-    const currUser = req.session.userId;
-    const mealType = req.body['meal-type'];
-    const foodItem = req.body['food-item'];
-    const mealDate = req.body['meal-date'];
-
-    // Retrieve calorie count for the selected food item from the database
-    admin.database().ref('foods').child(foodItem).once('value').then((snapshot) => {
-      const calories = 100;
-
-      // Save the meal data to the database
-      admin.database().ref('meals').child(currUser).push({
-        mealType: mealType,
-        foodItem: foodItem,
-        date: mealDate,
-        calories: calories
-      });
-
-    });
-    const mealsRef = admin.database().ref(`meals/${currUser}`);
-    const snapshot = await mealsRef.once('value');
-  
-    const meals = [];
-    snapshot.forEach((mealSnapshot) => {
-      const meal = mealSnapshot.val();
-      meal.key = mealSnapshot.key;
-      meals.push(meal);
-    });
-  
-    meals.sort((a, b) => a.date.localeCompare(b.date));
-    res.render('diet', { meals: meals });
-  });
->>>>>>> origin/main

@@ -89,5 +89,8 @@
         <button type="signup">Sign Up!</button>
       </div>
     </form>
+    <% if (message) { %>
+      <p class="error-message"><%= message %></p>
+    <% } %>
   </body>
 </html>
