@@ -35,6 +35,7 @@ app.use(session({
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
 // LOGIN PAGE
 app.get('/', (req, res) => {
   if (req.session.userId != null) {
@@ -93,10 +94,13 @@ app.post('/login', (req, res) => {
     const { email, username, password } = req.body;
     try { 
       // see if account exists
-      await admin.auth().getUserByEmail(email).then(() => {
-        // Email is already registered
-        res.render('signup', { message: 'Email is already registered' });
-      })
+      try {
+        await admin.auth().getUserByEmail(email).then(() => {
+          // Email is already registered
+          res.render('signup', { message: 'Email is already registered' });
+        })
+      } catch (e) {
+      }
       // Create a new user account in Firebase Authentication
       const userRecord = await admin.auth().createUser({
         email,
@@ -110,10 +114,10 @@ app.post('/login', (req, res) => {
         password
       });
   
-      res.send('User account created successfully!');
+      res.render('login', { message: 'Account created successfully' });
     } catch (error) {
       console.error(error);
-      res.status(500).send('Error creating user account');
+      res.render('signup', { message: 'Email is already registered' });
     }
   });
 
