@@ -379,13 +379,13 @@ app.post('/diet', function(req, res) {
 //   // });
 //   res.redirect('/home')
 // });
-// app.post('/logout', (req, res) => {
-//   req.session.userId = null;
-//   req.session.destroy(err => {
-//     if (err) {
-//       console.log(err);
-//     } else {
-//       return res.render('login', { message: "You are now logged out!"});
-//     }
-//   });
-// });
+app.post('/logout', (req, res) => {
+  req.session.userId = null;
+  req.session.destroy(err => {
+    if (err) {
+      console.log(err);
+    } else {
+      return res.render('login', { message: "You are now logged out!"});
+    }
+  });
+});
