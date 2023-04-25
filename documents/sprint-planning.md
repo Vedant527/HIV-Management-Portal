@@ -1,8 +1,8 @@
 
-Practicum Sprint #2 - Project Planning  
-Vedant Bhat, Ritvik Bhagawatula, Henna Mian, Shruthi Saravanan, Nishant Thangada
+# Practicum Sprint #2 - Project Planning  
+## Vedant Bhat, Ritvik Bhagawatula, Henna Mian, Shruthi Saravanan, Nishant Thangada
 
-vbhat24@gatech.edu, rbhagawatula3@gatech.edu, hmian31@gatech.edu, ssaravanan9@gatech.edu, nthangada3@gatech.edu
+## vbhat24@gatech.edu, rbhagawatula3@gatech.edu, hmian31@gatech.edu, ssaravanan9@gatech.edu, nthangada3@gatech.edu
 
 # PROJECT RESEARCH 
 
@@ -64,11 +64,11 @@ Overall, the HIV Management Web Application will provide a comprehensive solutio
 
 ## 2.3 Architecture Diagram
 
-
+![Architecture Diagram][Architecture Diagram.png]
 
 ## 2.4 Screen Mock-up (Early thoughts)
 
-
+![Wireframe][wireframe.png]
 
 # IMPLEMENTATION PLAN
 
