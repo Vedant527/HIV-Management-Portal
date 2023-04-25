@@ -20,7 +20,7 @@ app.set('view engine', 'ejs');
 app.set('views', './views');
 
 // Start the server
-const port = process.env.PORT || 3013;
+const port = process.env.PORT || 3014;
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
@@ -46,47 +46,33 @@ app.get('/', (req, res) => {
   }
 });
 
-app.post('/login', (req, res) => {
+app.post('/login', async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
     return res.render('login', { message: 'Please provide an email and password' });
   }
-  admin.auth().getUserByEmail(email)
-    .then((userRecord) => {
-      const uid = userRecord.uid;
-      admin.database().ref(`users/${uid}`).once('value')
-        .then((snapshot) => {
-          const userData = snapshot.val();
-          const actualPassword = userData.password;
-          if (password !== actualPassword) {
-            const errorMessage = 'Incorrect password. Please try again.';
-            return res.render('login', { message: errorMessage });
-          }
-          req.session.userId = uid;
-          return admin.auth().createCustomToken(uid)
-            .then((customToken) => {
-              saveCustomToken = customToken;
-              return res.render('home', { 
-                token: customToken, 
-                username: userData.username 
-              });
-            })
-            .catch((error) => {
-              console.log(error);
-              return res.render('login', { message: 'Error creating custom token' });
-            });
-        })
-        .catch((error) => {
-          console.log(`Error retrieving user data: ${error.message}`);
-          const errorMessage = 'Incorrect username or password. Please try again.';
-          return res.render('login', { message: errorMessage });
-        });
-    })
-    .catch((error) => {
-      console.log(error);
-      const errorMessage = 'Incorrect username. Please try again.';
+  try {
+    const userRecord = await admin.auth().getUserByEmail(email);
+    const uid = userRecord.uid;
+    const snapshot = await admin.database().ref(`users/${uid}`).once('value');
+    const userData = snapshot.val();
+    const actualPassword = userData.password;
+    if (password !== actualPassword) {
+      const errorMessage = 'Incorrect password. Please try again.';
       return res.render('login', { message: errorMessage });
+    }
+    req.session.userId = uid;
+    const customToken = await admin.auth().createCustomToken(uid);
+    saveCustomToken = customToken;
+    return res.render('home', { 
+      token: customToken, 
+      username: userData.username 
     });
+  } catch (error) {
+    console.log(error);
+    const errorMessage = 'Incorrect email or password. Please try again.';
+    return res.render('login', { message: errorMessage });
+  }
 });
 
 
@@ -130,18 +116,17 @@ app.post('/signup', async (req, res) => {
 
   // HOME PAGE
   
-app.get('/home', (req, res) => {
+app.get('/home', async (req, res) => {
   if (req.session.userId != null) {
-    const uid = req.session.userId;
-    admin.database().ref(`users/${uid}/username`).once('value')
-      .then((snapshot) => {
-        const username = snapshot.val();
-        return res.render('home', { username: username });
-      })
-      .catch((error) => {
-        console.log(`Error retrieving username: ${error.message}`);
-        return res.render('home', { username: null });
-      });
+    try {
+      const uid = req.session.userId;
+      const snapshot = await admin.database().ref(`users/${uid}/username`).once('value');
+      const username = snapshot.val();
+      return res.render('home', { username: username });
+    } catch (error) {
+      console.log(`Error retrieving username: ${error.message}`);
+      return res.render('home', { username: null });
+    }
   } else {
     return res.render('login', { message: null });
   }
@@ -199,43 +184,52 @@ app.post('/exercise', async function(req, res) {
   return res.redirect('/exercise');
 });
 
-app.post('/delete-event', (req, res) => {
+app.post('/delete-event', async (req, res) => {
   const exercise = req.body.exercise;
   const date = req.body.date;
   const length = req.body.length;
   const currUser = req.session.userId;
   const eventRef = admin.database().ref('users').child(currUser);
-  eventRef.orderByChild('date').on('value', function(snapshot) {
-    snapshot.forEach(function(childSnapshot) {
-      const childData = childSnapshot.val();
-      if (childData.hasOwnProperty('exercise') && childData.hasOwnProperty('date') && childData.hasOwnProperty('length')) {
-        if (childData.exercise === exercise && childData.length === length && childData.date === date) {
-          const eventRef2 = admin.database().ref(`users/${currUser}/${childSnapshot.key}`);
-          eventRef2.remove();
+
+  await new Promise((resolve, reject) => {
+    eventRef.orderByChild('date').on('value', function(snapshot) {
+      snapshot.forEach(function(childSnapshot) {
+        const childData = childSnapshot.val();
+        if (childData.hasOwnProperty('exercise') && childData.hasOwnProperty('date') && childData.hasOwnProperty('length')) {
+          if (childData.exercise === exercise && childData.length === length && childData.date === date) {
+            const eventRef2 = admin.database().ref(`users/${currUser}/${childSnapshot.key}`);
+            eventRef2.remove();
+          }
         }
-      }
+      });
+      resolve();
     });
   });
+
   const events = [];
 
-  admin.database().ref('users').child(currUser).orderByChild('date').on('value', function(snapshot) {
-    snapshot.forEach(function(childSnapshot) {
-      const childData = childSnapshot.val();
-      const event = {
-        title: childData.exercise,
-        start: childData.date
-      };
-      if (childData.exercise) {
-        events.push(event);
-        // event['calories'] = childData.calories;
-      }
-      if (childData.length) {
-        event['length'] = childData.length;
-      }
-      // events.push(event);
+  await new Promise((resolve, reject) => {
+    admin.database().ref('users').child(currUser).orderByChild('date').on('value', function(snapshot) {
+      snapshot.forEach(function(childSnapshot) {
+        const childData = childSnapshot.val();
+        const event = {
+          title: childData.exercise,
+          start: childData.date
+        };
+        if (childData.exercise) {
+          events.push(event);
+          // event['calories'] = childData.calories;
+        }
+        if (childData.length) {
+          event['length'] = childData.length;
+        }
+        // events.push(event);
+      });
+      resolve();
     });
-    return res.render('exercise', {events: events});
   });
+
+  res.render('exercise', { events: events });
 });
 
 
@@ -319,14 +313,14 @@ app.post('/appointments', async function(req, res) {
   }
 });
 
-app.post('/appointments/delete', (req, res) => {
+app.post('/appointments/delete', async (req, res) => {
   const type = req.body.type;
   const date = req.body.date;
   const time = req.body.time;
   const currUser = req.session.userId;
   const appointmentsRef = admin.database().ref('users').child(currUser);
 
-  appointmentsRef.orderByChild('date').equalTo(date).once('value', function(snapshot) {
+  await appointmentsRef.orderByChild('date').equalTo(date).once('value', function(snapshot) {
     snapshot.forEach(function(childSnapshot) {
       const childData = childSnapshot.val();
       if (childData.hasOwnProperty('type') && childData.hasOwnProperty('date') && childData.hasOwnProperty('time')) {
@@ -337,8 +331,9 @@ app.post('/appointments/delete', (req, res) => {
       }
     });
   });
+  
   const appointments = [];
-  appointmentsRef.orderByChild('date').on('value', function(snapshot) {
+  await appointmentsRef.orderByChild('date').on('value', function(snapshot) {
     snapshot.forEach(function(childSnapshot) {
       const childData = childSnapshot.val();
       if (childData.hasOwnProperty('type') && childData.hasOwnProperty('date') && childData.hasOwnProperty('time')) {
@@ -346,18 +341,19 @@ app.post('/appointments/delete', (req, res) => {
       }
     });
   });
+  
   return res.render('appointments', { appointments: appointments, message: "Appointment successfully deleted" });
 });
 
 // DIET PAGE
-app.get('/diet', function(req, res) {
+app.get('/diet', async function(req, res) {
   if (req.session.userId == null) {
     return res.render('login', { message: "Login to access the diet page!"});
   } else {
     const currUser = req.session.userId;
     const events = [];
 
-    admin.database().ref('users').child(currUser).orderByChild('date').on('value', function(snapshot) {
+    await admin.database().ref('users').child(currUser).orderByChild('date').once('value', function(snapshot) {
       snapshot.forEach(function(childSnapshot) {
         const childData = childSnapshot.val();
         const event = {
@@ -377,7 +373,7 @@ app.get('/diet', function(req, res) {
   }
 });
 
-app.post('/diet', function(req, res) {
+app.post('/diet', async function(req, res) {
   const type = req.body.type;
   const date = req.body.date;
   const dish = req.body.dish;
@@ -386,7 +382,7 @@ app.post('/diet', function(req, res) {
 
   //store data in database
   const currUser = req.session.userId;
-  admin.database().ref('users').child(currUser).push({
+  await admin.database().ref('users').child(currUser).push({
     type: type,
     date: date,
     dish: dish,
@@ -396,52 +392,71 @@ app.post('/diet', function(req, res) {
   return res.redirect('/diet');
 });
 
-app.post('/delete-dietEvent', (req, res) => {
+app.post('/delete-dietEvent', async (req, res) => {
   const type = req.body.type;
   const date = req.body.date;
   const dish = req.body.dish;
   const servings = req.body.servings;
   const currUser = req.session.userId;
   const eventRef = admin.database().ref('users').child(currUser);
-  eventRef.orderByChild('date').on('value', function(snapshot) {
-    snapshot.forEach(function(childSnapshot) {
-      const childData = childSnapshot.val();
-      if (childData.hasOwnProperty('dish') && childData.hasOwnProperty('date') && childData.hasOwnProperty('servings') && childData.hasOwnProperty('type')) {
-        if (childData.dish === dish && childData.date === date && childData.servings === servings && childData.type === type) {
-          const eventRef2 = admin.database().ref(`users/${currUser}/${childSnapshot.key}`);
-          eventRef2.remove();
-        }
-      }
+  
+  try {
+    await new Promise((resolve, reject) => {
+      eventRef.orderByChild('date').on('value', function(snapshot) {
+        snapshot.forEach(function(childSnapshot) {
+          const childData = childSnapshot.val();
+          if (childData.hasOwnProperty('dish') && childData.hasOwnProperty('date') && childData.hasOwnProperty('servings') && childData.hasOwnProperty('type')) {
+            if (childData.dish === dish && childData.date === date && childData.servings === servings && childData.type === type) {
+              const eventRef2 = admin.database().ref(`users/${currUser}/${childSnapshot.key}`);
+              eventRef2.remove(() => {
+                resolve();
+              });
+            }
+          }
+        });
+      });
     });
-  });
-  const events = [];
 
-  admin.database().ref('users').child(currUser).orderByChild('date').on('value', function(snapshot) {
-    snapshot.forEach(function(childSnapshot) {
-      const childData = childSnapshot.val();
-      const event = {
-        title: childData.type,
-        start: childData.date,
-      };
-      if (childData.servings) {
-        events.push(event);
-      }
-      if (childData.servings) {
-        event['servings'] = childData.servings;
-        event['dish'] = childData.dish;
-      }
+    const events = [];
+    await new Promise((resolve, reject) => {
+      admin.database().ref('users').child(currUser).orderByChild('date').on('value', function(snapshot) {
+        snapshot.forEach(function(childSnapshot) {
+          const childData = childSnapshot.val();
+          const event = {
+            title: childData.type,
+            start: childData.date,
+          };
+          if (childData.servings) {
+            events.push(event);
+          }
+          if (childData.servings) {
+            event['servings'] = childData.servings;
+            event['dish'] = childData.dish;
+          }
+        });
+        resolve();
+      });
     });
     return res.render('diet', {events: events});
-  });
+  } catch (err) {
+    console.log(err);
+  }
 });
 
-app.post('/logout', (req, res) => {
+app.post('/logout', async (req, res) => {
   req.session.userId = null;
-  req.session.destroy(err => {
-    if (err) {
-      console.log(err);
-    } else {
-      return res.render('login', { message: "You are now logged out!"});
-    }
-  });
+  try {
+    await new Promise((resolve, reject) => {
+      req.session.destroy(err => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
+    return res.render('login', { message: "You are now logged out!"});
+  } catch (err) {
+    console.log(err);
+  }
 });
