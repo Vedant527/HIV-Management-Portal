@@ -62,9 +62,9 @@ Overall, the HIV Management Web Application will provide a comprehensive solutio
 	- Firebase API (for database queries)
 	- Firebase Admin (for secure authentication of users)
 
-## 2.3 Architecture Diagram
+## 2.3 Architecture
 
-<img width="996" alt="Architecture Diagram" src="assets/Architecture Diagram.png">
+View the architecture and user diagrams in ./design.md
 
 ## 2.4 Screen Mock-up (Early thoughts)
 
@@ -72,7 +72,9 @@ Overall, the HIV Management Web Application will provide a comprehensive solutio
 
 # IMPLEMENTATION PLAN
 
-
+<img width="996" alt="timeline" src="assets/timeline1.png">
+<img width="996" alt="timeline" src="assets/timeline2.png">
+<img width="996" alt="timeline" src="assets/timeline3.png">
 
 # CITATIONS
 
