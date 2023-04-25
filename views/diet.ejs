@@ -5,17 +5,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.0/fullcalendar.min.css" />
     <link rel="stylesheet" href="fullcalendar.css" />
     <script src="fullcalendar.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 
-    <style>
-        #calendar {
-            max-width: 500px;
-            margin: 0 auto;
-        }
-    </style>  
+
 </head>
 <title>HIV Management Portal</title>
+
 <style>
-    body {
+	body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
@@ -24,21 +21,19 @@
         header {
             background-color: #333;
             color: #fff;
-            padding: 20px;
+            padding: 50px;
             text-align: center;
-            font-size: 24px;
+            font-size: 35px;
             font-weight: bold;
         }
         .container {
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-            margin: 20px;
-            padding: 20px;
-            background-color: #fff;
-            border: 1px solid #ccc;
-            box-shadow: 0px 2px 2px #ccc;
-        }
+			display: flex;
+			margin: 20px;
+			background-color: #fff;
+			border: 1px solid #ccc;
+			box-shadow: 0px 2px 2px #ccc;
+			}
+
         .card {
             display: flex;
             flex-direction: column;
@@ -79,49 +74,162 @@
             padding: 8px;
         }
         th {
-            background-color: #333;
+			background-color: #333;
             color: #fff;
         }
         tr:nth-child(even) {
             background-color: #f2f2f2;
         }
 
-        header a {
+		header a {
             color: #fff;
             text-decoration: none;
             }
         form {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            align-items: left;
+            justify-content: left;
             margin-top: 10px;
             margin-bottom: 30px;
             }
         h3 {
-            text-align: center;
+            text-align: left;
+			margin-left: 20px;
         }
 
-        form label,
-        form input {
-        margin-top: 10px;
-        margin-bottom: 10px;
+        p {
+            text-align: left;
+			margin-left: 20px;
         }
+
+        /* form label, */
+        form input {
+        /* margin-top: 10px;
+        margin-bottom: 10px; */
+		margin-left: 20px;
+		width: 30%;
+        }
+		input[type="date"], input[type="number"], select {
+			margin-left: 20px;
+			width: 30%;
+			}
+			button[type="submit"] {
+				margin-left: 20px;
+				width: 30%;
+			}
+			label {
+				margin-left: 20px;
+				
+			}
+			#calendar {
+				flex-basis: 50%; /* take up 50% of the available space */
+				padding: 20px;
+				border-right: 1px solid #ccc;
+				}
+        
+		#form-container {
+		flex-basis: 50%; /* take up 50% of the available space */
+		padding: 20px;
+		align-items: center;
+            justify-content: center;
+		
+		}
+			#table-container {
+			flex: 1;
+			padding: 20px;
+			}
+		input, select {
+			margin-bottom: 2px;
+		}
 </style>
 </head>
 <body>
     <header><a href="/home?username={{username}}">HIV Management Portal</a></header>
-    <!-- <form action="/homepage" method="POST">
-		<button type="submit">Home Page</button>
-	</form>
-    <form action="/logout" method="POST">
-		<button type="submit">Logout</button>
-	</form> -->
         <div class="card">
             <h2>Diet</h2>
         </div>
 
-        <div id="calendar"></div>
+        <div class="card">
+            <p>
+                <strong>More Information:</strong>  The dishes listed on this portal are suggestions for healthy meals for suitable for someone living with HIV. You can discover more healthy food options  <a href="https://hivinfo.nih.gov/understanding-hiv/fact-sheets/hiv-and-nutrition-and-food-safety"> on this website</a> provided by the National Institutes of Health.
+            </p>
+        </div>
+
+        <div class="container">
+			<div id="calendar"></div>
+			<div id="form-container">
+
+<h3>Record a Meal</h3>
+<form action="/diet" method="post">
+
+  <label for="date">Date</label>
+    <input type="date" id="date" name="date" required><br><br>
+    
+  <label for="type">Meal Type</label>
+    <select id="type" name="type" required>
+    <option value="Breakfast">Breakfast</option>
+    <option value="Lunch">Lunch</option>
+    <option value="Dinner">Dinner</option>
+    <option value="Snack">Snack</option>
+  </select><br><br>
+  
+    <label for="dish">Dish</label>
+    <select id="dish" name="dish" required>
+    <option value="Black beans">Black beans</option>
+    <option value="Brown rice">Brown rice</option>
+    <option value="Cereal">Cereal</option>
+    <option value="Cheese">Cheese</option>
+    <option value="Chicken">Chicken</option>
+    <option value="Eggs">Eggs</option>
+    <option value="Fruit">Fruit</option>
+    <option value="Fries">Fries</option>
+    <option value="Granola">Granola</option>
+    <option value="Greek yogurt">Greek yogurt</option>
+    <option value="Grilled cheese sandwich">Grilled cheese sandwich</option>
+    <option value="Hummus">Hummus</option>
+    <option value="Nut butter">Nut butter</option>
+    <option value="Nuts">Nuts</option>
+    <option value="Oatmeal">Oatmeal</option>
+    <option value="Pancakes">Pancakes</option>
+    <option value="Protein shake">Protein shake</option>
+    <option value="Rice cakes">Rice cakes</option>
+    <option value="Salsa">Salsa</option>
+    <option value="Salmon or fish">Salmon or fish</option>
+    <option value="Scrambled eggs">Scrambled eggs</option>
+    <option value="Shrimp">Shrimp</option>
+    <option value="Smoothie">Smoothie</option>
+    <option value="Stir-fry">Stir-fry</option>
+    <option value="Sweet potato">Sweet potato</option>
+    <option value="Tomato soup">Tomato soup</option>
+    <option value="Tofu">Tofu</option>
+    <option value="Trail mix">Trail mix</option>
+    <option value="Turkey">Turkey</option>
+    <option value="Veggie burger">Veggie burger</option>
+    <option value="Vegetable curry">Vegetable curry</option>
+    <option value="Vegetable soup">Vegetable soup</option>
+    <option value="Vegetables">Vegetables</option>
+    <option value="Whole grain crackers">Whole grain crackers</option>
+    <option value="Whole grain toast">Whole grain toast</option>
+    <option value="Whole wheat pasta">Whole wheat pasta</option>
+    <option value="White rice">White rice</option>
+    <option value="White toast">White toast</option>
+    <option value="Yogurt">Yogurt</option>
+  </select><br><br>
+
+    <label for="servings">Servings</label>
+    <input type="number" id="servings" name="servings" required><br><br>
+
+    <button type="submit">Record Meal</button>
+    </form>
+
+
+</div>
+</div>
+    <div id="table-container"></div>
+
+
+
         
             <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -201,6 +309,7 @@
             },
 
       eventClick: function(calEvent, jsEvent, view) {
+
           if (!tableCreated) {
             tableCreated = true;
           } else {
@@ -235,7 +344,7 @@
           eventsOnDate.forEach(function(event) {
             var dataRow = table.insertRow();
             var startCell = dataRow.insertCell();
-            startCell.innerHTML = event.start;
+            startCell.innerHTML = new Date(event.start).toLocaleDateString();
             var titleCell = dataRow.insertCell();
             titleCell.innerHTML = event.title;
             var dishCell = dataRow.insertCell();
@@ -264,79 +373,10 @@
 
 
             });
+
             });
+            
 
         </script>
-          
-<div id="table-container"></div>
-<h3>Record a Meal</h3>
-<form action="/diet" method="post">
-
-  <label for="date">Date:</label>
-    <input type="date" id="date" name="date">
-    
-  <label for="type">Meal Type:</label>
-    <select id="type" name="type">
-    <option value="Breakfast">Breakfast</option>
-    <option value="Lunch">Lunch</option>
-    <option value="Dinner">Dinner</option>
-    <option value="Snack">Snack</option>
-  </select>
-  
-    <label for="dish">Dish:</label>
-    <select id="dish" name="dish">
-    <option value="Black beans">Black beans</option>
-    <option value="Brown rice">Brown rice</option>
-    <option value="Cereal">Cereal</option>
-    <option value="Cheese">Cheese</option>
-    <option value="Chicken">Chicken</option>
-    <option value="Eggs">Eggs</option>
-    <option value="Fruit">Fruit</option>
-    <option value="Fries">Fries</option>
-    <option value="Granola">Granola</option>
-    <option value="Greek yogurt">Greek yogurt</option>
-    <option value="Grilled cheese sandwich">Grilled cheese sandwich</option>
-    <option value="Hummus">Hummus</option>
-    <option value="Nut butter">Nut butter</option>
-    <option value="Nuts">Nuts</option>
-    <option value="Oatmeal">Oatmeal</option>
-    <option value="Pancakes">Pancakes</option>
-    <option value="Protein shake">Protein shake</option>
-    <option value="Rice cakes">Rice cakes</option>
-    <option value="Salsa">Salsa</option>
-    <option value="Salmon or fish">Salmon or fish</option>
-    <option value="Scrambled eggs">Scrambled eggs</option>
-    <option value="Shrimp">Shrimp</option>
-    <option value="Smoothie">Smoothie</option>
-    <option value="Stir-fry">Stir-fry</option>
-    <option value="Sweet potato">Sweet potato</option>
-    <option value="Tomato soup">Tomato soup</option>
-    <option value="Tofu">Tofu</option>
-    <option value="Trail mix">Trail mix</option>
-    <option value="Turkey">Turkey</option>
-    <option value="Veggie burger">Veggie burger</option>
-    <option value="Vegetable curry">Vegetable curry</option>
-    <option value="Vegetable soup">Vegetable soup</option>
-    <option value="Vegetables">Vegetables</option>
-    <option value="Whole grain crackers">Whole grain crackers</option>
-    <option value="Whole grain toast">Whole grain toast</option>
-    <option value="Whole wheat pasta">Whole wheat pasta</option>
-    <option value="White rice">White rice</option>
-    <option value="White toast">White toast</option>
-    <option value="Yogurt">Yogurt</option>
-  </select>
-
-    <label for="servings">Servings:</label>
-    <input type="number" id="servings" name="servings">
-
-    <button type="submit">Submit</button>
-    </form>
-</div>
-<div>
-  <h3>More Information</h3>
-   <p>
-    The dishes listed on this portal are suggestions for healthy meals for suitable for someone living with HIV. You can discover more healthy food options  <a href="https://hivinfo.nih.gov/understanding-hiv/fact-sheets/hiv-and-nutrition-and-food-safety"> on this website</a> provided by the National Institutes of Health.
-</p>
-</div>
 </body>
 </html>
