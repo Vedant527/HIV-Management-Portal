@@ -37,10 +37,23 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 // LOGIN PAGE
-app.get('/', (req, res) => {
+app.get('/', async (req, res) => {
   if (req.session.userId != null) {
     const username = req.session.username;
-    return res.render('home', { username: username });
+    const userRef = admin.database().ref('users').child(uid);
+    const uid = req.session.userId;
+    const snapshot = await admin.database().ref(`users/${uid}/username`).once('value');
+    const appointments = []; 
+      userRef.orderByChild('type').on('value', function(snapshot) {
+        snapshot.forEach(function(childSnapshot) {
+            const childData = childSnapshot.val();
+            if (childData.hasOwnProperty('type') && childData.hasOwnProperty('date') && childData.hasOwnProperty('time')) {
+                appointments.push(childData);
+            }
+        });
+        var message = '';   
+      });
+    return res.render('home', { username: username, appointments:appointments });
   } else {
     return res.render('login', { message: null});
   }
@@ -57,16 +70,37 @@ app.post('/login', async (req, res) => {
     const snapshot = await admin.database().ref(`users/${uid}`).once('value');
     const userData = snapshot.val();
     const actualPassword = userData.password;
+    const username = req.session.username;
+    const userRef = admin.database().ref('users').child(uid);
+    const appointments = []; 
+
+
     if (password !== actualPassword) {
       const errorMessage = 'Incorrect password. Please try again.';
       return res.render('login', { message: errorMessage });
     }
+
     req.session.userId = uid;
+    // const appointments = [
+    //   { type: 'Doctor', date: '2023-05-01', time: '10:00 AM' },
+    //   { type: 'Lab', date: '2023-05-15', time: '11:00 AM' },
+    //   { type: 'Doctor', date: '2023-06-01', time: '09:00 AM' }
+    // ];
+    userRef.orderByChild('type').on('value', function(snapshot) {
+      snapshot.forEach(function(childSnapshot) {
+          const childData = childSnapshot.val();
+          if (childData.hasOwnProperty('type') && childData.hasOwnProperty('date') && childData.hasOwnProperty('time')) {
+              appointments.push(childData);
+          }
+      });
+      var message = '';   
+    });
     const customToken = await admin.auth().createCustomToken(uid);
     saveCustomToken = customToken;
     return res.render('home', { 
       token: customToken, 
-      username: userData.username 
+      username: userData.username,
+      appointments: appointments
     });
   } catch (error) {
     console.log(error);
@@ -117,15 +151,35 @@ app.post('/signup', async (req, res) => {
   // HOME PAGE
   
 app.get('/home', async (req, res) => {
+  const uid = req.session.userId;
+  const snapshot = await admin.database().ref(`users/${uid}/username`).once('value');
+  const username = snapshot.val();
+  const userRef = admin.database().ref('users').child(uid);
+  const appointments = []; 
   if (req.session.userId != null) {
     try {
-      const uid = req.session.userId;
-      const snapshot = await admin.database().ref(`users/${uid}/username`).once('value');
-      const username = snapshot.val();
-      return res.render('home', { username: username });
+      userRef.orderByChild('type').on('value', function(snapshot) {
+        snapshot.forEach(function(childSnapshot) {
+            const childData = childSnapshot.val();
+            if (childData.hasOwnProperty('type') && childData.hasOwnProperty('date') && childData.hasOwnProperty('time')) {
+                appointments.push(childData);
+            }
+        });
+        var message = '';   
+      });
+    return res.render('home', { username: username, appointments:appointments, message:message });
     } catch (error) {
+      userRef.orderByChild('type').on('value', function(snapshot) {
+        snapshot.forEach(function(childSnapshot) {
+            const childData = childSnapshot.val();
+            if (childData.hasOwnProperty('type') && childData.hasOwnProperty('date') && childData.hasOwnProperty('time')) {
+                appointments.push(childData);
+            }
+        });
+        var message = '';   
+      });
       console.log(`Error retrieving username: ${error.message}`);
-      return res.render('home', { username: null });
+      return res.render('home', { username: null, appointments:appointments });
     }
   } else {
     return res.render('login', { message: null });
