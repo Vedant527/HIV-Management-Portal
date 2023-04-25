@@ -56,10 +56,8 @@ We have already created a procfile to pass into heroku that deploys the applicat
  - *Exercise:* Once you have returned to your dashboard, enter the exercise page by clicking "view exercise." You may now view your exercise history by moving through the calendar. Click on a calendar entry to view the details of the activity. You can add more entries to the calendar by filling in the boxes on the right hand side of the page. Basic exercises are shown, such as running, walking, or treadmill. Ensure to fill out every entry to successfully create an activity. The calories burned from each activity are calculated and shown in the table, alongside a total calories burned that day.
  - *Diet:* On the diet page, you can add meals similarly to how you added exercises on the previous page. Ensure to fill out all values. You are provided a dropdown of common, healthy meals to choose from, and the calories for these entries will automatically be populated based on the serving size you input. Each meal is shown in the table alongside calorie count and total daily calorie intake.
 
-## Architecture Overview: User Diagram
-<img width="572" alt="Screen Shot 2023-04-24 at 8 50 03 PM" src="https://user-images.githubusercontent.com/55326679/234148726-c186a1f3-126a-4677-9347-4241c1246569.png">
+## Architecture Overview: 
 
-## Architecture Overview: Design
-<img width="996" alt="Screen Shot 2023-04-24 at 9 21 29 PM" src="https://user-images.githubusercontent.com/55326679/234151669-c0fe7a1b-69df-4bfa-a509-f4b2122e851a.png">
+For a detailed architecture overview navigate to /documents/design.md and /documents/sprint-planning.md
 
 
