@@ -64,11 +64,11 @@ Overall, the HIV Management Web Application will provide a comprehensive solutio
 
 ## 2.3 Architecture Diagram
 
-![Architecture Diagram][Architecture Diagram.png]
+<img width="996" alt="Architecture Diagram" src="assets/Architecture Diagram.png">
 
 ## 2.4 Screen Mock-up (Early thoughts)
 
-![Wireframe][wireframe.png]
+<img width="996" alt="Architecture Diagram" src="assets/Wireframe.png">
 
 # IMPLEMENTATION PLAN
 
