@@ -19,7 +19,7 @@
 
 ## Instructions for Grading
 
-1. Navigate to https://hiv-management.herokuapp.com
+1. Navigate to https://hiv-management.herokuapp.com (If there are any issues, move to the next section deploy the application yourself)
 2. Sign up as a new user
 3. Login to application
 4. Click on "View Appointments"
@@ -65,6 +65,19 @@ We have already created a procfile to pass into heroku that deploys the applicat
  7. create heroku app, you can use any app name you like -> `heroku create {app-name}`
  8. deploy the application -> `git push heroku main`
  9. access your application in the browser by viewing the link in the terminal logs or running `heroku open`
+ 
+## Getting Started: Generating a New Firebase Key
+
+If there are any issues with the existing key (pass.json) you can create a new one in the Firebase UI to replace it. Our team's TA already has access to our Firebase, however any other TA/User will have to contact us to be added to the Firebase project.
+
+1. login to Firebase
+2. go to our application page: HIV-Management-db
+3. click the settings gear next to project overview
+4. select users and permissions
+5. navigate to the service accounts tab
+6. generate a new private key
+7. rename the key to pass.json once it is downloaded, and replace the existing key in your cloned repo
+8. continue deploying either locally or using heroku
 
 ## User Guide: Key Features
 
