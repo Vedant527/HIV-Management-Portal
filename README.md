@@ -92,7 +92,7 @@ If there are any issues with the existing key (pass.json) you can create a new o
 ## Architecture Overview: 
 
 For a detailed architecture overview navigate to /documents/design.md and /documents/sprint-planning.md
-=======
+
  - *User Dashboard:* The user dashboard is the center of the application where you will be able to see informative articles for people suffering from HIV and/or access your appointments, exercise, and meal data. To access any of the latter three pages, click on their respective link to be transferred to that page. On this page, you may also logout with the button in the upper right hand corner.
  - *Appointments:* Here, you may view your past and upcoming appointments. To schedule an appointment, fill in the appointment type, time, and date fields and click the submit button. If you do not fill out the time field it will be left blank; however, if you do not fill out the date field you will be met with an error. To exit the appointments page, click the top of the screen where it says HIV Management Portal.
  - *Exercise:* Once you have returned to your dashboard, enter the exercise page by clicking "view exercise." You may now view your exercise history by moving through the calendar. Click on a calendar entry to view the details of the activity. You can add more entries to the calendar by filling in the boxes on the right hand side of the page. Ensure to fill out every entry to successfully create an activity.
