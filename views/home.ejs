@@ -22,6 +22,9 @@
 			margin-right: 20px;
 			text-align: right;
 		}
+		h3  {
+			font-weight: normal;
+		}
 
 		.container {
 			display: flex;
@@ -32,6 +35,17 @@
 			background-color: #fff;
 			border: 1px solid #ccc;
 			box-shadow: 0px 2px 2px #ccc;
+		}
+		.container2 {
+			display: flex;
+			flex-direction: row;
+			justify-content: space-between;
+			margin: 20px;
+			padding: 20px;
+			background-color: #fff;
+			border: 1px solid #ccc;
+			box-shadow: 0px 2px 2px #ccc;
+			font-weight: normal;
 		}
 		.card {
 			width: 300px; /* set a fixed width */
@@ -87,6 +101,9 @@
             border: 1px solid #ccc;
             box-shadow: 0px 2px 2px #ccc;
         }
+		img {
+			margin: 10px 10px;
+		}
 
 		
 	</style>
@@ -101,7 +118,23 @@
 	<div class="welcome">
 		<h2>Welcome <%= username %>!</h2>  
 	</div>
+
+
+	<div class="container">
+        <h3>Welcome to HIV HELPER. This web application will be used as a tool for people living with HIV. Through this application, users can stay informed about the disease itself, ensure that doctor and lab appointments are scheduled and all appointments are kept, and track exercise and healthy eating, These are the most important areas of care and management that should be considered for people living with HIV.
+            </h3>
+    </div>
+    <div class="container">
+        <% if (appointments.length > 0) { %>
+            <h2>Reminder: Upcoming <%= appointments[0].type %> Appointment</h2>
+            <p><%= appointments[0].date %> at <%= appointments[0].time %></p>
+          <% } else { %>
+            <h2>No Upcoming Appointments</h2>
+          <% } %>
+    </div>
 	
+
+
 	<div class="container">
 		<div class="card">
             <h2>Appointments</h2>
@@ -133,6 +166,25 @@
 				});
 			</script>
 		</div>
+
 	</div>
+	<div class = "container">
+        <div class="card">
+            <img src="https://imageio.forbes.com/specials-images/imageserve/1077065534/HIV-virus-AIDS-disease-concept-illustration-/0x0.jpg?format=jpg&crop=3300,2199,x0,y170,safe&width=960" width="220" height="260">
+            
+			<a href="https://www.medicalnewstoday.com/articles/323981">What is it Like to Live with HIV?</a>
+        </div>
+        <div class="card">
+            <img src="https://blog.nasm.org/hubfs/beginner-stretches.jpg" width="220" height="260" >
+            
+			<a href="https://www.webmd.com/hiv-aids/hiv-lifestyle-changes">Important Lifestyle Considerations</a>
+        </div>
+        <div class="card">
+            <img src="https://media.istockphoto.com/id/1183967695/photo/be-the-person-who-helps-the-next.jpg?s=612x612&w=0&k=20&c=zUIWa_uRJ6GXU5VHpTezYt-C0w2C7zBLCFVVsDUZrX8=" width="220" height="260">
+            
+			<a href="https://www.healthline.com/health/hiv/online-hiv-support-groups">Connect With Others</a>
+        </div>
+
+    </div>
 </body>
 </html>
