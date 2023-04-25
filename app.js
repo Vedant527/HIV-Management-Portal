@@ -40,8 +40,8 @@ app.use(bodyParser.json());
 app.get('/', async (req, res) => {
   if (req.session.userId != null) {
     const username = req.session.username;
-    const userRef = admin.database().ref('users').child(uid);
     const uid = req.session.userId;
+    const userRef = admin.database().ref('users').child(uid);
     const snapshot = await admin.database().ref(`users/${uid}/username`).once('value');
     const appointments = []; 
       userRef.orderByChild('type').on('value', function(snapshot) {
