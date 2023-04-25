@@ -19,7 +19,7 @@
 
 ## Instructions for Grading
 
-1. Navigate to https://hiv-management.herokuapp.com
+1. Navigate to https://hiv-management.herokuapp.com (If there are any issues, move to the next section deploy the application yourself)
 2. Sign up as a new user
 3. Login to application
 4. Click on "View Appointments"
@@ -65,6 +65,19 @@ We have already created a procfile to pass into heroku that deploys the applicat
  7. create heroku app, you can use any app name you like -> `heroku create {app-name}`
  8. deploy the application -> `git push heroku main`
  9. access your application in the browser by viewing the link in the terminal logs or running `heroku open`
+ 
+## Getting Started: Generating a New Firebase Key
+
+If there are any issues with the existing key (pass.json) you can create a new one in the Firebase UI to replace it. Our team's TA already has access to our Firebase, however any other TA/User will have to contact us to be added to the Firebase project.
+
+1. login to Firebase
+2. go to our application page: HIV-Management-db
+3. click the settings gear next to project overview
+4. select users and permissions
+5. navigate to the service accounts tab
+6. generate a new private key
+7. rename the key to pass.json once it is downloaded, and replace the existing key in your cloned repo
+8. continue deploying either locally or using heroku
 
 ## User Guide: Key Features
 
@@ -79,7 +92,7 @@ We have already created a procfile to pass into heroku that deploys the applicat
 ## Architecture Overview: 
 
 For a detailed architecture overview navigate to /documents/design.md and /documents/sprint-planning.md
-=======
+
  - *User Dashboard:* The user dashboard is the center of the application where you will be able to see informative articles for people suffering from HIV and/or access your appointments, exercise, and meal data. To access any of the latter three pages, click on their respective link to be transferred to that page. On this page, you may also logout with the button in the upper right hand corner.
  - *Appointments:* Here, you may view your past and upcoming appointments. To schedule an appointment, fill in the appointment type, time, and date fields and click the submit button. If you do not fill out the time field it will be left blank; however, if you do not fill out the date field you will be met with an error. To exit the appointments page, click the top of the screen where it says HIV Management Portal.
  - *Exercise:* Once you have returned to your dashboard, enter the exercise page by clicking "view exercise." You may now view your exercise history by moving through the calendar. Click on a calendar entry to view the details of the activity. You can add more entries to the calendar by filling in the boxes on the right hand side of the page. Ensure to fill out every entry to successfully create an activity.

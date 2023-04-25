@@ -126,8 +126,8 @@
     </div>
     <div class="container">
         <% if (appointments.length > 0) { %>
-            <h2>Reminder: Upcoming <%= appointments[0].type %> Appointment</h2>
-            <p><%= appointments[0].date %> at <%= appointments[0].time %></p>
+            <h2>Reminder: Upcoming <%= final.type %> Appointment</h2>
+            <p><%= final.date %> at <%= final.time %></p>
           <% } else { %>
             <h2>No Upcoming Appointments</h2>
           <% } %>
