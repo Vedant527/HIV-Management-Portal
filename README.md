@@ -20,7 +20,22 @@
 
 1. Navigate to https://hiv-management.herokuapp.com
 2. Sign up as a new user
-3. Continue to application
+3. Login to application
+4. Click on "View Appointments"
+5. Create 2 appointments for any date and time you would like
+6. Delete 1 or both appointments
+7. Click "HIV Management" at the top to return to home
+8. Click "View Exercise"
+9. Add an activity
+10. Click on the activity in the calendar to view details
+11. Delete the activity and refresh the page to remove it from calendar
+12. Return home
+13. Click on "View Diet"
+14. Add 2 meals for any date of your choosing
+15. View the meals on that date in the calendar by clicking on the date
+16. View your total calorie intake for the day
+17. Delete a meal
+18. Return home
 
 ## Getting Started: Local Deployment
 
