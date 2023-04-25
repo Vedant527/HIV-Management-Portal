@@ -53,7 +53,9 @@ app.get('/', async (req, res) => {
         });
         var message = '';   
       });
-      const final = appointments.length ? appointments.reduce((r, o) => o.date < r.date ? o : r): null; 
+      x = true;
+      const currentDate = new Date(); // get current date
+      const final = appointments.length ? appointments.reduce((r, o) => o.date < r.date && o.date > currentDate ? o : r): null; 
     return res.render('home', { username: username, final:final, appointments:appointments });
   } else {
     return res.render('login', { message: null});
@@ -98,9 +100,8 @@ app.post('/login', async (req, res) => {
     });
     const customToken = await admin.auth().createCustomToken(uid);
     saveCustomToken = customToken;
-    
-    const final = appointments.length ? appointments.reduce((r, o) => o.date < r.date ? o : r): null; 
-    
+    const currentDate = new Date(); // get current date
+    const final = appointments.length ? appointments.reduce((r, o) => o.date < r.date && o.date > currentDate ? o : r): null; 
     return res.render('home', { 
       token: customToken, 
       username: userData.username,
@@ -172,7 +173,8 @@ app.get('/home', async (req, res) => {
         });
         var message = '';   
       });
-      const final = appointments.length ? appointments.reduce((r, o) => o.date < r.date ? o : r): null; 
+      const currentDate = new Date(); // get current date
+      const final = appointments.length ? appointments.reduce((r, o) => o.date < r.date && o.date > currentDate ? o : r): null; 
     return res.render('home', { username: username, final:final, message:message, appointments:appointments });
     } catch (error) {
       userRef.orderByChild('type').on('value', function(snapshot) {
@@ -185,7 +187,8 @@ app.get('/home', async (req, res) => {
         var message = '';   
       });
       console.log(`Error retrieving username: ${error.message}`);
-      const final = appointments.length ? appointments.reduce((r, o) => o.date < r.date ? o : r): null; 
+      const currentDate = new Date(); // get current date
+      const final = appointments.length ? appointments.reduce((r, o) => o.date < r.date && o.date > currentDate ? o : r): null; 
       return res.render('home', { username: null, final:final, appointments:appointments });
     }
   } else {
