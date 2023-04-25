@@ -20,7 +20,7 @@ app.set('view engine', 'ejs');
 app.set('views', './views');
 
 // Start the server
-const port = process.env.PORT || 3014;
+const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
@@ -53,7 +53,7 @@ app.get('/', async (req, res) => {
         });
         var message = '';   
       });
-    const final = appointments.reduce((r, o) => o.date < r.date ? o : r); 
+      const final = appointments.length ? appointments.reduce((r, o) => o.date < r.date ? o : r): null; 
     return res.render('home', { username: username, final:final, appointments:appointments });
   } else {
     return res.render('login', { message: null});
@@ -98,7 +98,9 @@ app.post('/login', async (req, res) => {
     });
     const customToken = await admin.auth().createCustomToken(uid);
     saveCustomToken = customToken;
-    const final = appointments.reduce((r, o) => o.date < r.date ? o : r); 
+    
+    const final = appointments.length ? appointments.reduce((r, o) => o.date < r.date ? o : r): null; 
+    
     return res.render('home', { 
       token: customToken, 
       username: userData.username,
@@ -170,7 +172,7 @@ app.get('/home', async (req, res) => {
         });
         var message = '';   
       });
-      const final = appointments.reduce((r, o) => o.date < r.date ? o : r); 
+      const final = appointments.length ? appointments.reduce((r, o) => o.date < r.date ? o : r): null; 
     return res.render('home', { username: username, final:final, message:message, appointments:appointments });
     } catch (error) {
       userRef.orderByChild('type').on('value', function(snapshot) {
@@ -183,7 +185,7 @@ app.get('/home', async (req, res) => {
         var message = '';   
       });
       console.log(`Error retrieving username: ${error.message}`);
-      const final = appointments.reduce((r, o) => o.date < r.date ? o : r); 
+      const final = appointments.length ? appointments.reduce((r, o) => o.date < r.date ? o : r): null; 
       return res.render('home', { username: null, final:final, appointments:appointments });
     }
   } else {
