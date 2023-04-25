@@ -53,7 +53,8 @@ app.get('/', async (req, res) => {
         });
         var message = '';   
       });
-    return res.render('home', { username: username, appointments:appointments });
+    const final = appointments.reduce((r, o) => o.date < r.date ? o : r); 
+    return res.render('home', { username: username, final:final, appointments:appointments });
   } else {
     return res.render('login', { message: null});
   }
@@ -97,10 +98,12 @@ app.post('/login', async (req, res) => {
     });
     const customToken = await admin.auth().createCustomToken(uid);
     saveCustomToken = customToken;
+    const final = appointments.reduce((r, o) => o.date < r.date ? o : r); 
     return res.render('home', { 
       token: customToken, 
       username: userData.username,
-      appointments: appointments
+      final: final,
+      appointments:appointments
     });
   } catch (error) {
     console.log(error);
@@ -167,7 +170,8 @@ app.get('/home', async (req, res) => {
         });
         var message = '';   
       });
-    return res.render('home', { username: username, appointments:appointments, message:message });
+      const final = appointments.reduce((r, o) => o.date < r.date ? o : r); 
+    return res.render('home', { username: username, final:final, message:message, appointments:appointments });
     } catch (error) {
       userRef.orderByChild('type').on('value', function(snapshot) {
         snapshot.forEach(function(childSnapshot) {
@@ -179,7 +183,8 @@ app.get('/home', async (req, res) => {
         var message = '';   
       });
       console.log(`Error retrieving username: ${error.message}`);
-      return res.render('home', { username: null, appointments:appointments });
+      const final = appointments.reduce((r, o) => o.date < r.date ? o : r); 
+      return res.render('home', { username: null, final:final, appointments:appointments });
     }
   } else {
     return res.render('login', { message: null });
