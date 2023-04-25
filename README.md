@@ -25,12 +25,13 @@ We have already created a procfile to pass into heroku that deploys the applicat
 
  1. clone the repository to you local machine -> `"git clone https://github.com/Vedant527/HIV-Management.git"`
  2. cd into the newly created directory -> `"cd HIV-Management/"`
- 3. install heroku cli -> `"curl https://cliassets.heroku.com/install.sh | sh"`
- 4. verify installation -> `heroku --version`
- 5. login to heroku (this redirects you to a web browser) -> `heroku login`
- 6. create heroku app, you can use any app name you like -> `heroku create {app-name}`
- 7. deploy the application -> `git push heroku main`
- 8. access your application in the browser by viewing the link in the terminal logs or running `heroku open`
+ 3. install project dependencies -> `"npm install"`
+ 4. install heroku cli -> `"curl https://cliassets.heroku.com/install.sh | sh"`
+ 5. verify installation -> `heroku --version`
+ 6. login to heroku (this redirects you to a web browser) -> `heroku login`
+ 7. create heroku app, you can use any app name you like -> `heroku create {app-name}`
+ 8. deploy the application -> `git push heroku main`
+ 9. access your application in the browser by viewing the link in the terminal logs or running `heroku open`
 
 ## User Guide: Key Features
 
