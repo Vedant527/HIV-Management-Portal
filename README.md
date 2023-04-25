@@ -36,6 +36,7 @@
 16. View your total calorie intake for the day
 17. Delete a meal
 18. Return home
+19. Logout by clicking logout button on the right side of the screen
 
 ## Getting Started: Local Deployment
 
