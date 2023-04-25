@@ -1,5 +1,5 @@
 
-# Practicum Sprint #2 - Project Planning  
+# Project Planning (Practicum Sprint #2)
 ## Vedant Bhat, Ritvik Bhagawatula, Henna Mian, Shruthi Saravanan, Nishant Thangada
 
 ## vbhat24@gatech.edu, rbhagawatula3@gatech.edu, hmian31@gatech.edu, ssaravanan9@gatech.edu, nthangada3@gatech.edu
