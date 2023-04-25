@@ -8,6 +8,14 @@
  - express-session: v1.17.3
  - firebase-admin: v11.7.0
 
+## Environment Details
+
+- Live Deployment: https://hiv-management.herokuapp.com
+- Database URL: https://hiv-management-db-default-rtdb.firebaseio.com/
+- Static Site Directory: /views
+- View Engine: ejs
+- Database Key: pass.json (made public for assignment purposes and ease of use)
+
 ## Getting Started: Local Deployment
 
 In order to deploy the application locally, follow these steps in your terminal/command prompt:
