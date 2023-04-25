@@ -20,7 +20,7 @@ app.set('view engine', 'ejs');
 app.set('views', './views');
 
 // Start the server
-const port = process.env.PORT || 3012;
+const port = process.env.PORT || 3013;
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
@@ -40,9 +40,9 @@ app.use(bodyParser.json());
 app.get('/', (req, res) => {
   if (req.session.userId != null) {
     const username = req.session.username;
-    res.render('home', { username: username });
+    return res.render('home', { username: username });
   } else {
-    res.render('login', { message: null});
+    return res.render('login', { message: null});
   }
 });
 
@@ -93,7 +93,7 @@ app.post('/login', (req, res) => {
 
 // SIGNUP PAGE
 app.get('/signup', (req, res) => {
-  res.render('signup', {message: null});
+  return res.render('signup', {message: null});
 });
 
 app.post('/signup', async (req, res) => {
@@ -103,7 +103,7 @@ app.post('/signup', async (req, res) => {
     try {
       await admin.auth().getUserByEmail(email).then(() => {
         // Email is already registered
-        res.render('signup', { message: 'Email is already registered' });
+        return res.render('signup', { message: 'Email is already registered' });
       })
     } catch (e) {
     }
@@ -120,10 +120,10 @@ app.post('/signup', async (req, res) => {
       password
     });
 
-    res.render('login', { message: 'Account created successfully' });
+    return res.render('login', { message: 'Account created successfully' });
   } catch (error) {
     console.error(error);
-    res.render('signup', { message: 'Email is already registered' });
+    return res.render('signup', { message: 'Email is already registered' });
   }
 });
 
@@ -136,28 +136,29 @@ app.get('/home', (req, res) => {
     admin.database().ref(`users/${uid}/username`).once('value')
       .then((snapshot) => {
         const username = snapshot.val();
-        res.render('home', { username: username });
+        return res.render('home', { username: username });
       })
       .catch((error) => {
         console.log(`Error retrieving username: ${error.message}`);
-        res.render('home', { username: null });
+        return res.render('home', { username: null });
       });
   } else {
-    res.render('login', { message: null });
+    return res.render('login', { message: null });
   }
 });
 
 
 
 // EXERCISE PAGE
-app.get('/exercise', function(req, res) {
+app.get('/exercise', async function(req, res) {
   if (req.session.userId == null) {
-    res.render('login', { message: "Login to access the exercise page!"});
+    return res.render('login', { message: "Login to access the exercise page!"});
   } else {
-    const currUser = req.session.userId;
-    const events = [];
-
-    admin.database().ref('users').child(currUser).orderByChild('date').on('value', function(snapshot) {
+    try {
+      const currUser = req.session.userId;
+      const events = [];
+      
+      const snapshot = await admin.database().ref('users').child(currUser).orderByChild('date').once('value');
       snapshot.forEach(function(childSnapshot) {
         const childData = childSnapshot.val();
         const event = {
@@ -173,12 +174,15 @@ app.get('/exercise', function(req, res) {
         }
         // events.push(event);
       });
-      res.render('exercise', {events: events});
-    });
+      return res.render('exercise', {events: events});
+    } catch (error) {
+      console.log("Error:", error);
+      return res.status(500).send("Error getting exercise events");
+    }
   }
 });
 
-app.post('/exercise', function(req, res) {
+app.post('/exercise', async function(req, res) {
   const exercise = req.body.exercise;
   const date = req.body.date;
   const length = req.body.length;
@@ -186,13 +190,13 @@ app.post('/exercise', function(req, res) {
 
   //store data in database
   const currUser = req.session.userId;
-  admin.database().ref('users').child(currUser).push({
+  await admin.database().ref('users').child(currUser).push({
     exercise: exercise,
     date: date,
     length: length
     // calories: calories
   });
-  res.redirect('/exercise');
+  return res.redirect('/exercise');
 });
 
 app.post('/delete-event', (req, res) => {
@@ -230,21 +234,22 @@ app.post('/delete-event', (req, res) => {
       }
       // events.push(event);
     });
-    res.render('exercise', {events: events});
+    return res.render('exercise', {events: events});
   });
 });
 
 
 
 // APPOINTMENTS PAGE
-app.get('/appointments', function(req, res) {
+app.get('/appointments', async function(req, res) {
   if (req.session.userId == null) {
-    res.render('login', { message: "Login to access the appointments page!"});
+    return res.render('login', { message: "Login to access the appointments page!"});
   } else {
-    const currUser = req.session.userId;
-    const userRef = admin.database().ref('users').child(currUser);
+    try {
+      const currUser = req.session.userId;
+      const userRef = admin.database().ref('users').child(currUser);
 
-    userRef.orderByChild('type').on('value', function(snapshot) {
+      const snapshot = await userRef.orderByChild('type').once('value');
       const appointments = [];
       snapshot.forEach(function(childSnapshot) {
         const childData = childSnapshot.val();
@@ -253,12 +258,15 @@ app.get('/appointments', function(req, res) {
         }
       });
       var message = '';
-      res.render('appointments', { appointments: appointments, message: message });
-    });
+      return res.render('appointments', { appointments: appointments, message: message });
+    } catch (error) {
+      console.log("Error:", error);
+      return res.status(500).send("Error getting appointments");
+    }
   }
 });
 
-app.post('/appointments', function(req, res) {
+app.post('/appointments', async function(req, res) {
   const type = req.body.type;
   const date = req.body.date;
   const time = req.body.time;
@@ -266,7 +274,8 @@ app.post('/appointments', function(req, res) {
   const appointmentsRef = admin.database().ref('users').child(currUser);
   let exists = false;
 
-  appointmentsRef.orderByChild('date').equalTo(date).once('value', function(snapshot) {
+  try {
+    const snapshot = await appointmentsRef.orderByChild('date').equalTo(date).once('value');
     snapshot.forEach(function(childSnapshot) {
       const childData = childSnapshot.val();
       if (childData.hasOwnProperty('type') && childData.hasOwnProperty('date') && childData.hasOwnProperty('time')) {
@@ -275,40 +284,39 @@ app.post('/appointments', function(req, res) {
         }
       }
     });
+
     if (exists) {
       const appointments = [];
-      appointmentsRef.orderByChild('date').on('value', function(snapshot) {
-        snapshot.forEach(function(childSnapshot) {
-          const childData = childSnapshot.val();
-          if (childData.hasOwnProperty('type') && childData.hasOwnProperty('date') && childData.hasOwnProperty('time')) {
-            appointments.push(childData);
-          }
-        });
-        res.render('appointments', { appointments: appointments, message: "Appointment already exists" });
+      const snapshot = await appointmentsRef.orderByChild('date').once('value');
+      snapshot.forEach(function(childSnapshot) {
+        const childData = childSnapshot.val();
+        if (childData.hasOwnProperty('type') && childData.hasOwnProperty('date') && childData.hasOwnProperty('time')) {
+          appointments.push(childData);
+        }
       });
+      return res.render('appointments', { appointments: appointments, message: "Appointment already exists" });
     } else {
-      appointmentsRef.push({
+      await appointmentsRef.push({
         type: type,
         date: date,
         time: time,
-      }, function(error) {
-        if (error) {
-          console.log("Error adding appointment:", error);
-        } else {
-          const appointments = [];
-          appointmentsRef.orderByChild('date').on('value', function(snapshot) {
-            snapshot.forEach(function(childSnapshot) {
-              const childData = childSnapshot.val();
-              if (childData.hasOwnProperty('type') && childData.hasOwnProperty('date') && childData.hasOwnProperty('time')) {
-                appointments.push(childData);
-              }
-            });
-            res.render('appointments', { appointments: appointments, message: "Appointment successfully created" });
-          });
+      });
+
+      const appointments = [];
+      const snapshot = await appointmentsRef.orderByChild('date').once('value');
+      snapshot.forEach(function(childSnapshot) {
+        const childData = childSnapshot.val();
+        if (childData.hasOwnProperty('type') && childData.hasOwnProperty('date') && childData.hasOwnProperty('time')) {
+          appointments.push(childData);
         }
       });
+
+      return res.render('appointments', { appointments: appointments, message: "Appointment successfully created" });
     }
-  });
+  } catch (error) {
+    console.log("Error:", error);
+    return res.status(500).send("Error adding appointment");
+  }
 });
 
 app.post('/appointments/delete', (req, res) => {
@@ -338,13 +346,13 @@ app.post('/appointments/delete', (req, res) => {
       }
     });
   });
-  res.render('appointments', { appointments: appointments, message: "Appointment successfully deleted" });
+  return res.render('appointments', { appointments: appointments, message: "Appointment successfully deleted" });
 });
 
 // DIET PAGE
 app.get('/diet', function(req, res) {
   if (req.session.userId == null) {
-    res.render('login', { message: "Login to access the diet page!"});
+    return res.render('login', { message: "Login to access the diet page!"});
   } else {
     const currUser = req.session.userId;
     const events = [];
@@ -364,7 +372,7 @@ app.get('/diet', function(req, res) {
           event['dish'] = childData.dish;
         }
       });
-      res.render('diet', {events: events});
+      return res.render('diet', {events: events});
     });
   }
 });
@@ -385,7 +393,7 @@ app.post('/diet', function(req, res) {
     servings: servings
     // calories: calories
   });
-  res.redirect('/diet');
+  return res.redirect('/diet');
 });
 
 app.post('/delete-dietEvent', (req, res) => {
@@ -423,7 +431,7 @@ app.post('/delete-dietEvent', (req, res) => {
         event['dish'] = childData.dish;
       }
     });
-    res.render('diet', {events: events});
+    return res.render('diet', {events: events});
   });
 });
 
