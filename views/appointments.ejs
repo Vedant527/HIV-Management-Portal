@@ -154,6 +154,7 @@
                             <th>Type</th>
                             <th>Date</th>
                             <th>Time</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -162,6 +163,14 @@
                                 <td><%= appointment.type %></td>
                                 <td><%= appointment.date %></td>
                                 <td><%= appointment.time %></td>
+                                <td>
+                                    <form method="POST" action="/appointments/delete">
+                                        <input type="hidden" name="type" value="<%= appointment.type %>">
+                                        <input type="hidden" name="date" value="<%= appointment.date %>">
+                                        <input type="hidden" name="time" value="<%= appointment.time %>">
+                                        <button type="submit">Delete</button>
+                                      </form>
+                                  </td>
                             </tr>
                         <% }); %>
                     </tbody>         

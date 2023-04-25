@@ -242,6 +242,9 @@
 				caloriesHeader.innerHTML = "Calories";
 				headerRow.style.backgroundColor = "#333";
 				headerRow.style.color = "white";
+				var deleteHeader = headerRow.insertCell();
+				headerRow.style.backgroundColor = "#333";
+				headerRow.style.color = "white";
 
 				// add a data row to the table for the clicked event
 				var clickedDate = calEvent.start.format();
@@ -262,8 +265,35 @@
 					var calories = event.length * constants[event.title];
 					caloriesCell.innerHTML = calories;
 					totalCalories += calories;
+					var deleteCell = dataRow.insertCell();
+					var deleteButton = document.createElement("button");
+					deleteButton.innerHTML = "Delete";
+					deleteButton.addEventListener("click", function() {
+						// Pass event data to app.js file
+						var eventData = {
+						date: event.start,
+						exercise: event.title,
+						length: event.length
+						};
+						// Send the data to the app.js file using AJAX
+						var xhr = new XMLHttpRequest();
+						xhr.open("POST", "/delete-event");
+						xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+						xhr.send(JSON.stringify(eventData));
+						
+						// Remove event from array
+						var index = eventsOnDate.indexOf(event);
+						if (index !== -1) {
+						eventsOnDate.splice(index, 1);
+						}
+						
+						// Remove event from table
+						table.deleteRow(dataRow.rowIndex);
+						totalCalories -= calories;
+						totalCaloriesCell.innerHTML = totalCalories;
+					});
+					deleteCell.appendChild(deleteButton);
 				});
-
 				// add a row for the total calories
 				var totalRow = table.insertRow();
 				totalRow.style.fontWeight = "bold";

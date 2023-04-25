@@ -20,7 +20,7 @@ app.set('view engine', 'ejs');
 app.set('views', './views');
 
 // Start the server
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3012;
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
@@ -195,6 +195,45 @@ app.post('/exercise', function(req, res) {
   res.redirect('/exercise');
 });
 
+app.post('/delete-event', (req, res) => {
+  const exercise = req.body.exercise;
+  const date = req.body.date;
+  const length = req.body.length;
+  const currUser = req.session.userId;
+  const eventRef = admin.database().ref('users').child(currUser);
+  eventRef.orderByChild('date').on('value', function(snapshot) {
+    snapshot.forEach(function(childSnapshot) {
+      const childData = childSnapshot.val();
+      if (childData.hasOwnProperty('exercise') && childData.hasOwnProperty('date') && childData.hasOwnProperty('length')) {
+        if (childData.exercise === exercise && childData.length === length && childData.date === date) {
+          const eventRef2 = admin.database().ref(`users/${currUser}/${childSnapshot.key}`);
+          eventRef2.remove();
+        }
+      }
+    });
+  });
+  const events = [];
+
+  admin.database().ref('users').child(currUser).orderByChild('date').on('value', function(snapshot) {
+    snapshot.forEach(function(childSnapshot) {
+      const childData = childSnapshot.val();
+      const event = {
+        title: childData.exercise,
+        start: childData.date
+      };
+      if (childData.exercise) {
+        events.push(event);
+        // event['calories'] = childData.calories;
+      }
+      if (childData.length) {
+        event['length'] = childData.length;
+      }
+      // events.push(event);
+    });
+    res.render('exercise', {events: events});
+  });
+});
+
 
 
 // APPOINTMENTS PAGE
@@ -272,6 +311,35 @@ app.post('/appointments', function(req, res) {
   });
 });
 
+app.post('/appointments/delete', (req, res) => {
+  const type = req.body.type;
+  const date = req.body.date;
+  const time = req.body.time;
+  const currUser = req.session.userId;
+  const appointmentsRef = admin.database().ref('users').child(currUser);
+
+  appointmentsRef.orderByChild('date').equalTo(date).once('value', function(snapshot) {
+    snapshot.forEach(function(childSnapshot) {
+      const childData = childSnapshot.val();
+      if (childData.hasOwnProperty('type') && childData.hasOwnProperty('date') && childData.hasOwnProperty('time')) {
+        if (childData.type === type && childData.time === time && childData.date === date) {
+          const appointmentsRef2 = admin.database().ref(`users/${currUser}/${childSnapshot.key}`);
+          appointmentsRef2.remove();
+        }
+      }
+    });
+  });
+  const appointments = [];
+  appointmentsRef.orderByChild('date').on('value', function(snapshot) {
+    snapshot.forEach(function(childSnapshot) {
+      const childData = childSnapshot.val();
+      if (childData.hasOwnProperty('type') && childData.hasOwnProperty('date') && childData.hasOwnProperty('time')) {
+        appointments.push(childData);
+      }
+    });
+  });
+  res.render('appointments', { appointments: appointments, message: "Appointment successfully deleted" });
+});
 
 // DIET PAGE
 app.get('/diet', function(req, res) {
@@ -320,6 +388,44 @@ app.post('/diet', function(req, res) {
   res.redirect('/diet');
 });
 
+app.post('/delete-dietEvent', (req, res) => {
+  const type = req.body.type;
+  const date = req.body.date;
+  const dish = req.body.dish;
+  const servings = req.body.servings;
+  const currUser = req.session.userId;
+  const eventRef = admin.database().ref('users').child(currUser);
+  eventRef.orderByChild('date').on('value', function(snapshot) {
+    snapshot.forEach(function(childSnapshot) {
+      const childData = childSnapshot.val();
+      if (childData.hasOwnProperty('dish') && childData.hasOwnProperty('date') && childData.hasOwnProperty('servings') && childData.hasOwnProperty('type')) {
+        if (childData.dish === dish && childData.date === date && childData.servings === servings && childData.type === type) {
+          const eventRef2 = admin.database().ref(`users/${currUser}/${childSnapshot.key}`);
+          eventRef2.remove();
+        }
+      }
+    });
+  });
+  const events = [];
+
+  admin.database().ref('users').child(currUser).orderByChild('date').on('value', function(snapshot) {
+    snapshot.forEach(function(childSnapshot) {
+      const childData = childSnapshot.val();
+      const event = {
+        title: childData.type,
+        start: childData.date,
+      };
+      if (childData.servings) {
+        events.push(event);
+      }
+      if (childData.servings) {
+        event['servings'] = childData.servings;
+        event['dish'] = childData.dish;
+      }
+    });
+    res.render('diet', {events: events});
+  });
+});
 
 app.post('/logout', (req, res) => {
   req.session.userId = null;
