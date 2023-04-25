@@ -5,17 +5,7 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.0/fullcalendar.min.css" />
 	<link rel="stylesheet" href="fullcalendar.css" />
 	<script src="fullcalendar.js"></script>
-
-	<style>
-		#calendar {
-			max-width: 500px;
-			margin: 0 auto;
-			float: left;
-			margin-right: 20px;
-			margin-left: 20px;
-		}
-		
-	</style>  
+ 
 </head>
 <title>HIV Management Portal</title>
 <style>
@@ -28,25 +18,19 @@
         header {
             background-color: #333;
             color: #fff;
-            padding: 20px;
+            padding: 50px;
             text-align: center;
-            font-size: 24px;
+            font-size: 35px;
             font-weight: bold;
         }
         .container {
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-            margin: 20px;
-            padding: 20px;
-            background-color: #fff;
-            border: 1px solid #ccc;
-            box-shadow: 0px 2px 2px #ccc;
-        }
-		.column {
-			flex: 1;
-			margin: 10px;
-		}
+			display: flex;
+			margin: 20px;
+			background-color: #fff;
+			border: 1px solid #ccc;
+			box-shadow: 0px 2px 2px #ccc;
+			}
+
         .card {
             display: flex;
             flex-direction: column;
@@ -116,38 +100,81 @@
         /* margin-top: 10px;
         margin-bottom: 10px; */
 		margin-left: 20px;
-		width: 20%;
+		width: 30%;
         }
 		input[type="date"], input[type="number"], select {
 			margin-left: 20px;
-			width: 20%;
+			width: 30%;
 			}
 			button[type="submit"] {
 				margin-left: 20px;
-				width: 20%;
+				width: 30%;
 			}
 			label {
 				margin-left: 20px;
 				
 			}
+			#calendar {
+				flex-basis: 50%; /* take up 50% of the available space */
+				padding: 20px;
+				border-right: 1px solid #ccc;
+				}
+        
+		#form-container {
+		flex-basis: 50%; /* take up 50% of the available space */
+		padding: 20px;
+		align-items: center;
+            justify-content: center;
+		
+		}
+			#table-container {
+			flex: 1;
+			padding: 20px;
+			}
+		input, select {
+			margin-bottom: 2px;
+		}
 
 		
 </style>
 </head>
 <body>
 	<header><a href="/home?username={{username}}">HIV Management Portal</a></header>
-	<!-- <form action="/homepage" method="POST">
-		<button type="submit">Home Page</button>
-	</form>
-	<form action="/logout" method="POST">
-		<button type="submit">Logout</button>
-	</form> -->
 		<div class="card">
 			<h2>Exercise</h2>
 		</div>
 		
+		<div class="container">
+			<div id="calendar"></div>
+			<div id="form-container">
 
-		<div id="calendar"></div>
+			<h3>Log an Exercise</h3>
+<form action="/exercise" method="post">
+	<label for="date">Date</label>
+	<input type="date" id="date" name="date" required><br><br>
+
+	<label for="exercise">Exercise Type</label>
+	<select id="exercise" name="exercise" required>
+		<option value="Calisthenics">Calisthenics</option>
+		<option value="Dancing">Dancing</option>
+		<option value="Elliptical">Elliptical</option>
+		<option value="Pilates">Pilates</option>
+		<option value="Running">Running</option>
+		<option value="Swimming">Swimming</option>
+		<option value="Treadmill">Treadmill</option>
+		<option value="Walking">Walking</option>
+		<option value="Yoga">Yoga</option>
+	</select><br><br>
+	
+	<label for="length">Exercise Length (in minutes)</label>
+	<input type="number" id="length" name="length" required><br><br>
+	
+	<button type="submit">Log Exercise</button>
+</form>
+		</div>
+	</div>
+		<div id="table-container"></div>
+
 		
 			<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
 			<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -215,6 +242,9 @@
 				caloriesHeader.innerHTML = "Calories";
 				headerRow.style.backgroundColor = "#333";
 				headerRow.style.color = "white";
+				var deleteHeader = headerRow.insertCell();
+				headerRow.style.backgroundColor = "#333";
+				headerRow.style.color = "white";
 
 				// add a data row to the table for the clicked event
 				var clickedDate = calEvent.start.format();
@@ -226,7 +256,7 @@
 				eventsOnDate.forEach(function(event) {
 					var dataRow = table.insertRow();
 					var startCell = dataRow.insertCell();
-					startCell.innerHTML = event.start;
+					startCell.innerHTML = new Date(event.start).toLocaleDateString();
 					var titleCell = dataRow.insertCell();
 					titleCell.innerHTML = event.title;
 					var lengthCell = dataRow.insertCell();
@@ -235,8 +265,35 @@
 					var calories = event.length * constants[event.title];
 					caloriesCell.innerHTML = calories;
 					totalCalories += calories;
+					var deleteCell = dataRow.insertCell();
+					var deleteButton = document.createElement("button");
+					deleteButton.innerHTML = "Delete";
+					deleteButton.addEventListener("click", function() {
+						// Pass event data to app.js file
+						var eventData = {
+						date: event.start,
+						exercise: event.title,
+						length: event.length
+						};
+						// Send the data to the app.js file using AJAX
+						var xhr = new XMLHttpRequest();
+						xhr.open("POST", "/delete-event");
+						xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+						xhr.send(JSON.stringify(eventData));
+						
+						// Remove event from array
+						var index = eventsOnDate.indexOf(event);
+						if (index !== -1) {
+						eventsOnDate.splice(index, 1);
+						}
+						
+						// Remove event from table
+						table.deleteRow(dataRow.rowIndex);
+						totalCalories -= calories;
+						totalCaloriesCell.innerHTML = totalCalories;
+					});
+					deleteCell.appendChild(deleteButton);
 				});
-
 				// add a row for the total calories
 				var totalRow = table.insertRow();
 				totalRow.style.fontWeight = "bold";
@@ -253,42 +310,5 @@
 			});
 			});
 		</script>
-		  
-<div id="table-container"></div>
-<h3>Log an Exercise</h3>
-<form action="/exercise" method="post">
-	<label for="date">Date</label>
-	<input type="date" id="date" name="date"><br><br>
-
-	<label for="exercise">Exercise Type:</label>
-	<select id="exercise" name="exercise">
-		<option value="Calisthenics">Calisthenics</option>
-		<option value="Dancing">Dancing</option>
-		<option value="Elliptical">Elliptical</option>
-		<option value="Pilates">Pilates</option>
-		<option value="Running">Running</option>
-		<option value="Swimming">Swimming</option>
-		<option value="Treadmill">Treadmill</option>
-		<option value="Walking">Walking</option>
-		<option value="Yoga">Yoga</option>
-	</select><br><br>
-	
-	
-	<label for="length">Exercise Length (in minutes)</label>
-	<input type="number" id="length" name="length"><br><br>
-	
-	<!-- <label for="calories">Calories Burned (optional):</label>
-	<input type="number" id="calories" name="calories"><br><br> -->
-	
-	<button type="submit">Log Exercise</button>
-</form>
-
-<style>
-  input, select {
-    margin-bottom: 2px;
-  }
-</style>
-
-</div>
 </body>
 </html>
