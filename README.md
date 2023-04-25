@@ -19,7 +19,7 @@
 
 ## Instructions for Grading
 
-1. Navigate to https://hiv-management.herokuapp.com (If there are any issues, move to the next section deploy the application yourself)
+1. Navigate to https://hiv-management.herokuapp.com (If there are any issues, move to the next section and deploy the application yourself)
 2. Sign up as a new user
 3. Login to application
 4. Click on "View Appointments"
